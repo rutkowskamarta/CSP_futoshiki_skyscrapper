@@ -1,4 +1,6 @@
 ﻿using System;
+using CSP_futoshiki_skyscrapper.Utils;
+using static System.Console;
 
 namespace CSP_futoshiki_skyscrapper
 {
@@ -6,7 +8,9 @@ namespace CSP_futoshiki_skyscrapper
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            DataLoader dataLoader = new DataLoader();
+            ReadLine();
         }
+
     }
 }

@@ -173,4 +173,9 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="CSP\" />
+    <Folder Include="FutoshikiSctructures\" />
+  </ItemGroup>
+
 </Project>
