@@ -111,7 +111,7 @@ namespace CSP_futoshiki_skyscrapper.Utils
             }
 
             futoshikiGraph.PrintAllConstraints();
-
+            FutoshikiProblemSingleton.GetInstance().initialFutoshikiGraph = futoshikiGraph;
 
         }
 

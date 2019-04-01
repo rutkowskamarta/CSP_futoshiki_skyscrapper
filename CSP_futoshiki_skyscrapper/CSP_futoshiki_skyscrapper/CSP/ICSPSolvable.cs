@@ -6,6 +6,7 @@ namespace CSP_futoshiki_skyscrapper.CSP
 {
     interface ICSPSolvable
     {
+        
 
     }
 }

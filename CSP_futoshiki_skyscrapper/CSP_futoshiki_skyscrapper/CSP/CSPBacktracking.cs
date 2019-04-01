@@ -4,6 +4,7 @@ using System.Text;
 using CSP_futoshiki_skyscrapper.DataStructures;
 using static CSP_futoshiki_skyscrapper.Utils.Utilities;
 using CSP_futoshiki_skyscrapper.SkyscraperStructures;
+using CSP_futoshiki_skyscrapper.FutoshikiStructures;
 
 namespace CSP_futoshiki_skyscrapper.CSP
 {
@@ -26,13 +27,35 @@ namespace CSP_futoshiki_skyscrapper.CSP
         {
             if(GAME_TYPE == GAME_TYPE_ENUM.FUTOSHIKI)
             {
-
+                FutoshikiSolver();
             }
             else if(GAME_TYPE == GAME_TYPE_ENUM.SKYSCRAPPER)
             {
+                SkyscrapperSolver();
             }
         }
 
+        #region FUTOSHIKI
+        private void FutoshikiSolver()
+        {
+            TreeNode<FutoshikiGraph> root = new TreeNode<FutoshikiGraph>(FutoshikiProblemSingleton.GetInstance().initialFutoshikiGraph);
+            //wypełniać drzewo dopóki nie wrócę do korzenia i nie będzie kolejnych ścieżek
+            GraphNode<int> mostLimited = root.data.ChooseTheMostLimitedAndNotSet();
+            List<int> allPossibilities = root.data.ReturnAllPossibilitiesForNode(mostLimited);
+            //dodaj jako nowe plansze i nowe dzieci, jeżeli liczba możliwości równa się 0, backtrack
+
+            while (true) //tutaj dodać ten warunek, może coś z visited
+            {
+
+            }
+
+        }
+
+
+        #endregion
+
+
+        #region SKYSCRAPPER
         private void SkyscrapperSolver()
         {
             SkyscraperArray initialArray = new SkyscraperArray(SkyscraperProblemSingleton.problemSize);
@@ -49,6 +72,7 @@ namespace CSP_futoshiki_skyscrapper.CSP
             return startingNode;
 
         }
+        #endregion
 
     }
 }

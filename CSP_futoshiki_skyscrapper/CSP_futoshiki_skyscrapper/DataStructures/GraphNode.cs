@@ -31,6 +31,13 @@ namespace CSP_futoshiki_skyscrapper.DataStructures
             outgoingEdges.Add(edge);
         }
 
+        public GraphNode<T> DeepClone()
+        {
+            GraphNode<T> graphNode = new GraphNode<T>(data, isMutable, xIndex, yIndex);
+            return graphNode;
+        }
+       
+
         
     }
 }
