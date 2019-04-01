@@ -3,32 +3,24 @@ using System.Collections.Generic;
 using System.Text;
 using CSP_futoshiki_skyscrapper.DataStructures;
 using static System.Console;
+using System.Linq;
 
 namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
 {
-    class FutoshikiGraph
+    class FutoshikiGraph : Graph<int> 
     {
-        public int arraySize { get; }
-        public Graph<int> elementsGraph;
+        public override GraphNode<int>[,] nodes { get => base.nodes; set => base.nodes = value; }
 
-        public FutoshikiGraph(int arraySize)
-        {
-            this.arraySize = arraySize;
-            elementsGraph = new Graph<int>(arraySize);
-        }
-
-        public void AddNewFutoshikiElement(GraphNode<int> futoshikiElement)
-        {
-            elementsGraph.AddNode(futoshikiElement);
-        }
+        public FutoshikiGraph(int problemSize) : base(problemSize)
+        {}
 
         public void PrintAllElements()
         {
-            for (int i = 0; i < arraySize; i++)
+            for (int i = 0; i < problemSize; i++)
             {
-                for (int j = 0; j < arraySize; j++)
+                for (int j = 0; j < problemSize; j++)
                 {
-                    Write(elementsGraph.nodes[i,j].data);
+                    Write(nodes[i,j].data+" ");
                 }
                 WriteLine();
             }
@@ -36,13 +28,31 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
 
         public void PrintAllElementsMutables()
         {
-            for (int i = 0; i < arraySize; i++)
+            for (int i = 0; i < problemSize; i++)
             {
-                for (int j = 0; j < arraySize; j++)
+                for (int j = 0; j < problemSize; j++)
                 {
-                    Write(elementsGraph.nodes[i,j].isMutable+" ");
+                    Write(nodes[i,j].isMutable+" ");
                 }
                 WriteLine();
+            }
+        }
+
+        public void PrintAllConstraints()
+        {
+            for (int i = 0; i < problemSize; i++)
+            {
+                for (int j = 0; j < problemSize; j++)
+                {
+                    WriteLine("NODE: " + nodes[i, j].data + ": ");
+                    foreach (var item in nodes[i, j].outgoingEdges)
+                    {
+                        WriteLine(item.ToString());
+                    }
+                    WriteLine("---------");
+                }
+                 
+
             }
         }
     }

@@ -10,8 +10,7 @@ namespace CSP_futoshiki_skyscrapper.DataStructures
         public bool isMutable { get; }
         public int xIndex { get; }
         public int yIndex { get; }
-        List<GraphEdge<T>> outgoingEdges { get; } //krawędź wychodząca
-
+        public List<GraphEdge<T>> outgoingEdges { get; } //krawędź wychodząca
 
         public GraphNode(T data, bool isMutable, int xIndex, int yIndex)
         {
@@ -32,5 +31,6 @@ namespace CSP_futoshiki_skyscrapper.DataStructures
             outgoingEdges.Add(edge);
         }
 
+        
     }
 }

@@ -8,7 +8,7 @@ namespace CSP_futoshiki_skyscrapper.DataStructures
 
     class GraphEdge<T>
     {
-        public enum EDGE_TYPE_ENUM { SOURCE_GREATER, DESTINATION_GRATER, NO_TYPE }
+        public enum EDGE_TYPE_ENUM { SOURCE_GREATER, DESTINATION_GRATER}
 
         public GraphNode<T> sourceNode { get; set; }
         public GraphNode<T> destinationNode { get; set; }
@@ -21,11 +21,18 @@ namespace CSP_futoshiki_skyscrapper.DataStructures
             this.edgeType = edgeType;
         }
 
-        public GraphEdge(EDGE_TYPE_ENUM edgeType)
+        public override string ToString()
         {
-            sourceNode = null;
-            destinationNode = null;
-            this.edgeType = edgeType;
+            string edgeTypeString = "";
+            if(edgeType == EDGE_TYPE_ENUM.DESTINATION_GRATER)
+            {
+                edgeTypeString = "<";
+            }
+            else
+            {
+                edgeTypeString = ">";
+            }
+            return $" src: ({sourceNode.xIndex},{sourceNode.yIndex}) {edgeTypeString} dst: ({destinationNode.xIndex},{destinationNode.yIndex}) ";
         }
     }
 }

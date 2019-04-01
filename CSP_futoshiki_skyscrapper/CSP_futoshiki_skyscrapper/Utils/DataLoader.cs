@@ -82,7 +82,7 @@ namespace CSP_futoshiki_skyscrapper.Utils
                 string[] oneMatrixLine = allLines[counter].Split(';');
                 for (int i = 0; i < oneMatrixLine.Length; i++)
                 {
-                    futoshikiGraph.AddNewFutoshikiElement(ParseNode(oneMatrixLine[i], counter - 2, i));
+                    futoshikiGraph.AddNode(ParseNode(oneMatrixLine[i], counter - 2, i));
                 }
                 counter++;
             }
@@ -93,6 +93,25 @@ namespace CSP_futoshiki_skyscrapper.Utils
             futoshikiGraph.PrintAllElementsMutables();
             Console.WriteLine();
 
+            counter++;
+
+            while (counter < allLines.Length)
+            {
+                char[] constraintLine = allLines[counter].ToCharArray();
+                int xIndex1 = System.Convert.ToInt32(constraintLine[0]) - 65;
+                int yIndex1 = int.Parse(constraintLine[1].ToString()) - 1;
+                int xIndex2 = System.Convert.ToInt32(constraintLine[3]) - 65;
+                int yIndex2 = int.Parse(constraintLine[4].ToString()) - 1;
+
+                futoshikiGraph.AddEdgeFromSource(xIndex1, yIndex1, xIndex2, yIndex2, GraphEdge<int>.EDGE_TYPE_ENUM.DESTINATION_GRATER);
+                futoshikiGraph.AddEdgeFromSource(xIndex2, yIndex2, xIndex1, yIndex1, GraphEdge<int>.EDGE_TYPE_ENUM.SOURCE_GREATER);
+
+                counter++;
+
+            }
+
+            futoshikiGraph.PrintAllConstraints();
+
 
         }
 
@@ -101,29 +120,10 @@ namespace CSP_futoshiki_skyscrapper.Utils
             int nodeValue = int.Parse(line);
             bool isMutable = (nodeValue == 0) ? true : false;
 
-
-
             GraphNode<int> node = new GraphNode<int>(nodeValue, isMutable, x, y);
             return node;
 
         }
-
-        private List<GraphEdge<int>>[,] ParseConstraints(string[] allLines, int counter, int problemSize)
-        {
-            //TUTAJ!!!!
-            List<GraphEdge<int>>[,] edgesMatrix = new List<GraphEdge<int>>[problemSize, problemSize];
-            List<GraphEdge<int>> fileEdges = new List<GraphEdge<int>>();
-            while (counter<allLines.Length)
-            {
-                string[] constraintLine = allLines[counter].Split(';');
-                
-            }
-
-            return edgesMatrix;
-
-        }
-
-
 
     }
 }
