@@ -173,8 +173,4 @@
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="FutoshikiSctructures\" />
-  </ItemGroup>
-
 </Project>

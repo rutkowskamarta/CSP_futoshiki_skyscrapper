@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 using static System.Console;
 using System.Linq;
-
+using CSP_futoshiki_skyscrapper.CSP;
 namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
 {
-    class SkyscraperArray
+    class SkyscraperArray : ICSPSolvable
     {
         public int arraySize { get; set; }
         public SkyscraperNode[,] contentArray { get; set; }
