@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using static System.Console;
 using CSP_futoshiki_skyscrapper.DataStructures;
 using static CSP_futoshiki_skyscrapper.Utils.Utilities;
 using CSP_futoshiki_skyscrapper.SkyscraperStructures;
@@ -8,7 +9,7 @@ using CSP_futoshiki_skyscrapper.FutoshikiStructures;
 
 namespace CSP_futoshiki_skyscrapper.CSP
 {
-    class CSPBacktracking<T>
+    class CSPBacktracking
     {
         //back tracking dla skyscrapper- budowanie drzewa:
         //1. wybierz najbardziej ograniczony wiersz/kolumnę 
@@ -36,18 +37,39 @@ namespace CSP_futoshiki_skyscrapper.CSP
         }
 
         #region FUTOSHIKI
-        private void FutoshikiSolver()
+        private List<FutoshikiGraph> FutoshikiSolver()
         {
-            TreeNode<FutoshikiGraph> root = new TreeNode<FutoshikiGraph>(FutoshikiProblemSingleton.GetInstance().initialFutoshikiGraph);
-            //wypełniać drzewo dopóki nie wrócę do korzenia i nie będzie kolejnych ścieżek
-            GraphNode<int> mostLimited = root.data.ChooseTheMostLimitedAndNotSet();
-            List<int> allPossibilities = root.data.ReturnAllPossibilitiesForNode(mostLimited);
-            //dodaj jako nowe plansze i nowe dzieci, jeżeli liczba możliwości równa się 0, backtrack
+            List<FutoshikiGraph> solutionsList = new List<FutoshikiGraph>();
 
-            while (true) //tutaj dodać ten warunek, może coś z visited
+            Tree<FutoshikiGraph> backtrackingTree = new Tree<FutoshikiGraph>(FutoshikiProblemSingleton.GetInstance().initialFutoshikiGraph);
+
+            OneCycle(backtrackingTree.root);
+            WriteLine(backtrackingTree.HeightOfTree(backtrackingTree.root));
+            backtrackingTree.PrintLevelOrder();
+            
+            //jeśli wszystkie dzieci roota będą issolved to koniec, jeśli nie będzie można dopasować rozwiązania, to backtracking i usuwanie tego noda
+            //while (true) //tutaj dodać ten warunek, może coś z visited
+            //{
+
+            //}
+
+            return solutionsList;
+
+        }
+
+        private TreeNode<FutoshikiGraph> OneCycle(TreeNode<FutoshikiGraph> currentNode)
+        {
+            GraphNode<int> mostLimited = currentNode.data.ChooseTheMostLimitedAndNotSet();
+            List<int> allPossibilities = currentNode.data.ReturnAllPossibilitiesForNode(mostLimited);
+                      
+            for (int i = 0; i < allPossibilities.Count; i++)
             {
-
+                FutoshikiGraph futoshikiGraphClone = currentNode.data.DeepClone();
+                futoshikiGraphClone.nodes[mostLimited.xIndex, mostLimited.yIndex].data = allPossibilities[i];
+                currentNode.AddChild(futoshikiGraphClone);
             }
+
+            return currentNode;
 
         }
 

@@ -34,5 +34,11 @@ namespace CSP_futoshiki_skyscrapper.DataStructures
             }
             return $" src: ({sourceNode.xIndex},{sourceNode.yIndex}) {edgeTypeString} dst: ({destinationNode.xIndex},{destinationNode.yIndex}) ";
         }
+
+        public GraphEdge<T> DeepClone()
+        {
+            return new GraphEdge<T>(sourceNode, destinationNode, edgeType);
+        }
+
     }
 }

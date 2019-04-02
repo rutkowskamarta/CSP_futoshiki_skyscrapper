@@ -10,7 +10,7 @@ namespace CSP_futoshiki_skyscrapper.DataStructures
         public bool isMutable { get; }
         public int xIndex { get; }
         public int yIndex { get; }
-        public List<GraphEdge<T>> outgoingEdges { get; } //krawędź wychodząca
+        public List<GraphEdge<T>> outgoingEdges { get; set; } //krawędź wychodząca
 
         public GraphNode(T data, bool isMutable, int xIndex, int yIndex)
         {
@@ -34,6 +34,11 @@ namespace CSP_futoshiki_skyscrapper.DataStructures
         public GraphNode<T> DeepClone()
         {
             GraphNode<T> graphNode = new GraphNode<T>(data, isMutable, xIndex, yIndex);
+            graphNode.outgoingEdges = new List<GraphEdge<T>>();
+            foreach (var item in outgoingEdges)
+            {
+                graphNode.outgoingEdges.Add(item.DeepClone());
+            }
             return graphNode;
         }
        

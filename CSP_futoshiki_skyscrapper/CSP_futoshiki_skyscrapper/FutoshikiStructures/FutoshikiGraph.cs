@@ -14,8 +14,36 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
         public FutoshikiGraph(int problemSize) : base(problemSize)
         {}
 
+        public FutoshikiGraph DeepClone()
+        {
+            FutoshikiGraph futoshikiGraph = new FutoshikiGraph(problemSize);
+            for (int i = 0; i < problemSize; i++)
+            {
+                for (int j = 0; j < problemSize; j++)
+                {
+                    futoshikiGraph.nodes[i, j] = nodes[i, j].DeepClone();
+                }
+                //po tym jak skopiuję wszystkie nody, muszę poprzypisywać im nowe source i dest
 
-       
+            }
+            for (int i = 0; i < problemSize; i++)
+            {
+                for (int j = 0; j < problemSize; j++)
+                {
+                    for (int k = 0; k < nodes[i, j].outgoingEdges.Count; k++)
+                    {
+                        //skopiuję krawędź i podmienię jej source i dest
+                        //przypisane są stare referencje
+                        nodes[i, j].outgoingEdges[k].sourceNode = nodes[i, j];
+                        GraphNode<int> oldDestination = nodes[i, j].outgoingEdges[k].destinationNode;
+                        GraphNode<int> newDestination = nodes[oldDestination.xIndex, oldDestination.yIndex];
+
+                    }
+                }
+            }
+            return futoshikiGraph;
+        }
+
         public List<int> ReturnAllPossibilitiesForNode(GraphNode<int> node)
         {
             List<int> allPosibilites = new List<int>();
@@ -39,15 +67,15 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
             {
                 for (int j = 0; j < node.outgoingEdges.Count; j++)
                 {
-                    if(node.outgoingEdges[i].edgeType == GraphEdge<int>.EDGE_TYPE_ENUM.DESTINATION_GRATER)
+                    if(node.outgoingEdges[j].edgeType == GraphEdge<int>.EDGE_TYPE_ENUM.DESTINATION_GRATER)
                     {
-                        if (node.outgoingEdges[i].destinationNode.data != 0 && allPosibilites[j] > node.outgoingEdges[i].destinationNode.data)
+                        if (node.outgoingEdges[j].destinationNode.data != 0 && allPosibilites[i] > node.outgoingEdges[j].destinationNode.data)
                             itemsToRemove.Add(allPosibilites[j]);
                     }
                     else
                     {
-                        if (node.outgoingEdges[i].destinationNode.data != 0 && allPosibilites[j] < node.outgoingEdges[i].destinationNode.data)
-                            itemsToRemove.Add(allPosibilites[j]);
+                        if (node.outgoingEdges[j].destinationNode.data != 0 && allPosibilites[i] < node.outgoingEdges[j].destinationNode.data)
+                            itemsToRemove.Add(allPosibilites[i]);
                     }
                 }
 
@@ -66,11 +94,24 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
         public GraphNode<int> ChooseTheMostLimitedAndNotSet()
         {
             var ordered = nodes.OfType<GraphNode<int>>();
-            return ordered.Select(i => i).Where(i => i.data == 0).OrderBy(i => i.outgoingEdges.Count).First();
+            return ordered.Select(i => i).Where(i => i.data == 0).OrderByDescending(i => i.outgoingEdges.Count).First();
 
         }
 
-       
+
+        public override string ToString()
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (int i = 0; i < problemSize; i++)
+            {
+                for (int j = 0; j < problemSize; j++)
+                {
+                    stringBuilder.Append(nodes[i, j].data +";");
+                }
+                stringBuilder.Append("=");
+            }
+            return stringBuilder.ToString();
+        }
 
         public void PrintAllElements()
         {

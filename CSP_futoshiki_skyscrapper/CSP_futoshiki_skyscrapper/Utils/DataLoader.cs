@@ -87,11 +87,11 @@ namespace CSP_futoshiki_skyscrapper.Utils
                 counter++;
             }
 
-            Console.WriteLine("=========");
-            futoshikiGraph.PrintAllElements();
-            Console.WriteLine();
-            futoshikiGraph.PrintAllElementsMutables();
-            Console.WriteLine();
+            //Console.WriteLine("=========");
+            //futoshikiGraph.PrintAllElements();
+            //Console.WriteLine();
+            //futoshikiGraph.PrintAllElementsMutables();
+            //Console.WriteLine();
 
             counter++;
 
@@ -110,7 +110,7 @@ namespace CSP_futoshiki_skyscrapper.Utils
 
             }
 
-            futoshikiGraph.PrintAllConstraints();
+            //futoshikiGraph.PrintAllConstraints();
             FutoshikiProblemSingleton.GetInstance().initialFutoshikiGraph = futoshikiGraph;
 
         }
