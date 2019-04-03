@@ -28,14 +28,14 @@ namespace CSP_futoshiki_skyscrapper.CSP
         }
 
         #region FUTOSHIKI
-        private List<FutoshikiGraph> FutoshikiSolver()
+        private void FutoshikiSolver()
         {
-            Tree<FutoshikiGraph> backtrackingTree = new Tree<FutoshikiGraph>(FutoshikiProblemSingleton.GetInstance().initialFutoshikiGraph);
+            FutoshikiGraph rootData = FutoshikiProblemSingleton.GetInstance().initialFutoshikiGraph.DeepClone();
+            Tree<FutoshikiGraph> backtrackingTree = new Tree<FutoshikiGraph>(rootData);
 
             CreateChildren(backtrackingTree.root);
             PrintAllSolutions();
-
-            return solutionsList;
+            
         }
 
         private void CreateChildren(TreeNode<FutoshikiGraph> currentNode)

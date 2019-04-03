@@ -13,9 +13,69 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
 
         public FutoshikiGraph(int problemSize) : base(problemSize){}
 
+        public bool IsAnyOfDomainsEmpty()
+        {
+            return nodes.OfType<GraphNode<int>>().AsParallel().Any(i => i.domain.Count== 0);
+        }
+
         public void AssignNewData(int xIndex, int yIndex, int newData)
         {
             nodes[xIndex, yIndex].data = newData;
+        }
+
+        public void AssignNewDataAndUpdateDomains(int xIndex, int yIndex, int newData)
+        {
+            nodes[xIndex, yIndex].data = newData;
+            UpdateAllDomains(nodes[xIndex, yIndex], newData);
+        }
+
+        private void UpdateAllDomains(GraphNode<int> node, int newData)
+        {
+            UpdateDomainInRowsAndColumns(node, newData);
+            UpdateDomainsForConstraints(node, newData);
+        }
+
+        private void UpdateDomainInRowsAndColumns(GraphNode<int>node, int data)
+        {
+            for (int i = 0; i < problemSize; i++)
+            {
+                var columnElement = nodes[i, node.yIndex];
+                columnElement.domain.Remove(data);
+
+                var rowElement = nodes[node.xIndex, i];
+                rowElement.domain.Remove(data);
+            }
+        }
+
+        private void UpdateDomainsForConstraints(GraphNode<int> node, int data)
+        {
+            for (int i = 0; i < node.outgoingEdges.Count; i++)
+            {
+                GraphEdge<int> outgoingEdge = node.outgoingEdges[i];
+                GraphNode<int> destination = outgoingEdge.destinationNode;
+                if (outgoingEdge.edgeType == GraphEdge<int>.EDGE_TYPE_ENUM.DESTINATION_GRATER)
+                {
+                    for (int j = 0; j < destination.domain.Count; j++)
+                    {
+                        if (destination.domain[j] < data)
+                            destination.domain.RemoveAt(j);
+                    }
+                }
+                else
+                {
+                    for (int j = 0; j < destination.domain.Count; j++)
+                    {
+                        if (destination.domain[j] > data)
+                            destination.domain.RemoveAt(j);
+                    }
+                }
+                
+            }
+        }
+
+        public void InitializeAllDomains()
+        {
+            nodes.OfType<GraphNode<int>>().AsParallel().ForAll(i=>i.InitializeDomain(problemSize));
         }
 
         #region CLONING
