@@ -11,46 +11,77 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
     {
         public override GraphNode<int>[,] nodes { get => base.nodes; set => base.nodes = value; }
 
-        public FutoshikiGraph(int problemSize) : base(problemSize)
+        public FutoshikiGraph(int problemSize) : base(problemSize){}
+
+        public void AssignNewData(int xIndex, int yIndex, int newData)
         {
+            nodes[xIndex, yIndex].data = newData;
         }
 
+        #region CLONING
         public FutoshikiGraph DeepClone()
         {
             FutoshikiGraph futoshikiGraph = new FutoshikiGraph(problemSize);
+
+            CloneAllNodesToNewGraph(futoshikiGraph);
+            CloneAllEdgesToNewGraph(futoshikiGraph);
+
+            return futoshikiGraph;
+        }
+
+        private void CloneAllNodesToNewGraph(FutoshikiGraph futoshikiGraph)
+        {
             for (int i = 0; i < problemSize; i++)
             {
                 for (int j = 0; j < problemSize; j++)
                 {
                     futoshikiGraph.nodes[i, j] = nodes[i, j].DeepClone();
                 }
-                //po tym jak skopiuję wszystkie nody, muszę poprzypisywać im nowe source i dest
-
             }
+        }
+
+        private void CloneAllEdgesToNewGraph(FutoshikiGraph futoshikiGraph)
+        {
             for (int i = 0; i < problemSize; i++)
             {
                 for (int j = 0; j < problemSize; j++)
                 {
                     for (int k = 0; k < nodes[i, j].outgoingEdges.Count; k++)
                     {
-                        //skopiuję krawędź i podmienię jej source i dest
-                        //przypisane są stare referencje
                         futoshikiGraph.nodes[i, j].outgoingEdges[k].sourceNode = futoshikiGraph.nodes[i, j];
                         GraphNode<int> oldDestination = nodes[i, j].outgoingEdges[k].destinationNode;
                         futoshikiGraph.nodes[i, j].outgoingEdges[k].destinationNode = futoshikiGraph.nodes[oldDestination.xIndex, oldDestination.yIndex];
                     }
                 }
             }
-            return futoshikiGraph;
         }
+        #endregion
 
         public List<int> ReturnAllPossibilitiesForNode(GraphNode<int> node)
         {
-            List<int> allPosibilites = new List<int>();
-            List<int> itemsToRemove = new List<int>();
+            List<int> allPosibilites = InitializeAllPossibilities();
+            List<int> itemsToRemove = RepeatedPossibilitiesInColumnOrRowOfElement(node, allPosibilites);
 
+            RemoveProperItemsFromAllPossibilities(allPosibilites, itemsToRemove);
+            itemsToRemove = PossibilitiesNotFulfillingConstraints(node, allPosibilites);
+
+            RemoveProperItemsFromAllPossibilities(allPosibilites, itemsToRemove);
+
+            return allPosibilites;
+
+        }
+
+        private List<int> InitializeAllPossibilities()
+        {
+            List<int> allPosibilites = new List<int>();
             for (int i = 0; i < problemSize; i++)
-                allPosibilites.Add(i+1);
+                allPosibilites.Add(i + 1);
+            return allPosibilites;
+        }
+
+        private List<int> RepeatedPossibilitiesInColumnOrRowOfElement(GraphNode<int> node, List<int> allPosibilites)
+        {
+            List<int> itemsToRemove = new List<int>();
 
             for (int i = 0; i < problemSize; i++)
             {
@@ -63,39 +94,40 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
                     itemsToRemove.Add(rowElement.data);
             }
 
+            return itemsToRemove;
+        }
+    
+        private void RemoveProperItemsFromAllPossibilities(List<int> allPosibilites, List<int> itemsToRemove)
+        {
             for (int i = 0; i < itemsToRemove.Count; i++)
-            {
                 allPosibilites.Remove(itemsToRemove[i]);
-            }
+        }
 
-            itemsToRemove.Clear();
-
-
+        private List<int> PossibilitiesNotFulfillingConstraints(GraphNode<int> node, List<int> allPosibilites)
+        {
+            List<int> itemsToRemove = new List<int>();
             for (int i = 0; i < node.outgoingEdges.Count; i++)
             {
                 for (int j = 0; j < allPosibilites.Count; j++)
                 {
-                    if (node.outgoingEdges[i].edgeType == GraphEdge<int>.EDGE_TYPE_ENUM.DESTINATION_GRATER)
-                    {
-                        if (node.outgoingEdges[i].destinationNode.data != 0 && allPosibilites[j] > node.outgoingEdges[i].destinationNode.data)
-                            itemsToRemove.Add(allPosibilites[j]);
-                    }
-                    else
-                    {
-                        if (node.outgoingEdges[i].destinationNode.data != 0 && allPosibilites[j] < node.outgoingEdges[i].destinationNode.data)
-                            itemsToRemove.Add(allPosibilites[j]);
-                    }
+                    CheckConstraint(node.outgoingEdges[i], allPosibilites[j], itemsToRemove);
                 }
-                
             }
+            return itemsToRemove;
+        }
 
-            for (int i = 0; i < itemsToRemove.Count; i++)
+        private void CheckConstraint(GraphEdge<int> graphEdge, int possibility, List<int> itemsToRemove)
+        {
+            if (graphEdge.edgeType == GraphEdge<int>.EDGE_TYPE_ENUM.DESTINATION_GRATER)
             {
-                allPosibilites.Remove(itemsToRemove[i]);
+                if (graphEdge.destinationNode.data != 0 && possibility > graphEdge.destinationNode.data)
+                    itemsToRemove.Add(possibility);
             }
-
-            return allPosibilites;
-
+            else
+            {
+                if (graphEdge.destinationNode.data != 0 && possibility < graphEdge.destinationNode.data)
+                    itemsToRemove.Add(possibility);
+            }
         }
 
         public GraphNode<int> ChooseTheMostLimitedAndNotSet()
@@ -103,13 +135,9 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
             nodes.OfType<GraphNode<int>>().AsParallel().Where(i=>i.data==0).ForAll(i => i.measure = CalculateMeasure(i));
             var ordered = nodes.OfType<GraphNode<int>>().OrderByDescending(i => i.measure).Where(i => i.data == 0).ToList();
             if(ordered.Count == 0)
-            {
                 return null;
-            }
             else
-            {
                 return ordered.First();
-            }
         }
 
         public bool IsFutoshikiSolved()
@@ -143,9 +171,11 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
             return rowMeasure + columnMeasure + constraintMeasure;
         }
 
+        #region PRINTING
         public override string ToString()
         {
             StringBuilder stringBuilder = new StringBuilder();
+            
             for (int i = 0; i < problemSize; i++)
             {
                 for (int j = 0; j < problemSize; j++)
@@ -194,9 +224,8 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
                     }
                     WriteLine("---------");
                 }
-                 
-
             }
         }
+        #endregion
     }
 }

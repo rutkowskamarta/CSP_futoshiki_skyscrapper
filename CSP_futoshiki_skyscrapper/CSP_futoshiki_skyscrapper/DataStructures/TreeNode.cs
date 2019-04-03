@@ -27,16 +27,5 @@ namespace CSP_futoshiki_skyscrapper.DataStructures
         {
             children.Add(treeNode);
         }
-
-        public bool AreAllChildrenSolved()
-        {
-            for (int i = 0; i < children.Count; i++)
-            {
-                if (!children[i].isSolved)
-                    return false;
-            }
-            return true;
-        }
-
     }
 }

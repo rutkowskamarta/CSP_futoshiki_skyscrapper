@@ -8,13 +8,14 @@ namespace CSP_futoshiki_skyscrapper.DataStructures
 {
     class Tree<T>
     {
-        public TreeNode<T> root { get; } //początkowo wypełniona plansza
+        public TreeNode<T> root { get; }
 
         public Tree(T rootData)
         {
             root = new TreeNode<T>(null, rootData);
         }
 
+        #region PRINTING
         public int HeightOfTree(TreeNode<T> root)
         {
             if (root == null)
@@ -57,6 +58,6 @@ namespace CSP_futoshiki_skyscrapper.DataStructures
                 
             }
         }
-
+        #endregion
     }
 }

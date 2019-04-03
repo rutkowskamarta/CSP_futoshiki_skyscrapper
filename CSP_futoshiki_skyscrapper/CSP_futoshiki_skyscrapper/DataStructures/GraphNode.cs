@@ -22,11 +22,6 @@ namespace CSP_futoshiki_skyscrapper.DataStructures
             outgoingEdges = new List<GraphEdge<T>>();
         }
 
-        public void AddEdge(GraphNode<T> other, GraphEdge<T>.EDGE_TYPE_ENUM edgeType)
-        {
-            outgoingEdges.Add(new GraphEdge<T>(this, other, edgeType));
-        }
-
         public void AddEdge(GraphEdge<T> edge)
         {
             outgoingEdges.Add(edge);

@@ -4,8 +4,6 @@ using System.Text;
 
 namespace CSP_futoshiki_skyscrapper.DataStructures
 {
-    //krawędź skierowana, ważona
-
     class GraphEdge<T>
     {
         public enum EDGE_TYPE_ENUM { SOURCE_GREATER, DESTINATION_GRATER}
@@ -21,18 +19,12 @@ namespace CSP_futoshiki_skyscrapper.DataStructures
             this.edgeType = edgeType;
         }
 
-        public override string ToString()
+        public bool IsEdgeSatisfied()
         {
-            string edgeTypeString = "";
-            if(edgeType == EDGE_TYPE_ENUM.DESTINATION_GRATER)
-            {
-                edgeTypeString = "<";
-            }
+            if (edgeType == EDGE_TYPE_ENUM.DESTINATION_GRATER)
+                return sourceNode.CompareTo(destinationNode.data) < 0;
             else
-            {
-                edgeTypeString = ">";
-            }
-            return $" src: ({sourceNode.xIndex},{sourceNode.yIndex}) {edgeTypeString} dst: ({destinationNode.xIndex},{destinationNode.yIndex}) ";
+                return destinationNode.CompareTo(sourceNode.data) < 0;
         }
 
         public GraphEdge<T> DeepClone()
@@ -40,17 +32,14 @@ namespace CSP_futoshiki_skyscrapper.DataStructures
             return new GraphEdge<T>(sourceNode, destinationNode, edgeType);
         }
 
-        public bool IsEdgeSatisfied()
+        public override string ToString()
         {
-            if(edgeType == EDGE_TYPE_ENUM.DESTINATION_GRATER)
-            {
-                return sourceNode.CompareTo(destinationNode.data) < 0;
-            }
+            string edgeTypeString = "";
+            if (edgeType == EDGE_TYPE_ENUM.DESTINATION_GRATER)
+                edgeTypeString = "<";
             else
-            {
-                return destinationNode.CompareTo(sourceNode.data) < 0;
-            }
+                edgeTypeString = ">";
+            return $" src: ({sourceNode.xIndex},{sourceNode.yIndex}) {edgeTypeString} dst: ({destinationNode.xIndex},{destinationNode.yIndex}) ";
         }
-
     }
 }
