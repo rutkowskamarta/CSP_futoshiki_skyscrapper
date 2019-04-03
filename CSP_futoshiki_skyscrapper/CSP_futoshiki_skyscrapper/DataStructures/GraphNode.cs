@@ -1,30 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using CSP_futoshiki_skyscrapper.CSP;
 
 namespace CSP_futoshiki_skyscrapper.DataStructures
 {
-    class GraphNode<T> : IComparable<T>
+    class GraphNode : CSPNode
     {
-        public T data { get; set; }
-        public bool isMutable { get; }
-        public int xIndex { get; }
-        public int yIndex { get; }
-        public int measure { get; set; }
-        public List<GraphEdge<T>> outgoingEdges { get; set; } //krawędź wychodząca
+        
+        public List<GraphEdge> outgoingEdges { get; set; } //krawędź wychodząca
 
-        //for forwardChecking
-        public List<int> domain { get; set; }
-
-        public GraphNode(T data, bool isMutable, int xIndex, int yIndex)
+        public GraphNode(int data, bool isMutable, int xIndex, int yIndex) : base(data, isMutable, xIndex, yIndex)
         {
-            this.data = data;
-            this.isMutable = isMutable;
-            this.xIndex = xIndex;
-            this.yIndex = yIndex;
-            outgoingEdges = new List<GraphEdge<T>>();
-            
-            domain = new List<int>();
+            outgoingEdges = new List<GraphEdge>();
         }
 
         public void InitializeDomain(int problemSize)
@@ -33,15 +21,15 @@ namespace CSP_futoshiki_skyscrapper.DataStructures
                 domain.Add(i + 1);
         }
         
-        public void AddEdge(GraphEdge<T> edge)
+        public void AddEdge(GraphEdge edge)
         {
             outgoingEdges.Add(edge);
         }
 
-        public GraphNode<T> DeepClone()
+        public override CSPNode DeepClone()
         {
-            GraphNode<T> graphNode = new GraphNode<T>(data, isMutable, xIndex, yIndex);
-            graphNode.outgoingEdges = new List<GraphEdge<T>>();
+            GraphNode graphNode = new GraphNode(data, isMutable, xIndex, yIndex);
+            graphNode.outgoingEdges = new List<GraphEdge>();
             graphNode.measure = measure;
             graphNode.domain = new List<int>();
             foreach (var item in outgoingEdges)
@@ -67,9 +55,9 @@ namespace CSP_futoshiki_skyscrapper.DataStructures
             return true;
         }
 
-        public int CompareTo(T other)
+        public bool IsGreaterThan(int other)
         {
-            return Comparer<T>.Default.Compare(data, other);
+            return data>other;
         }
     }
 }

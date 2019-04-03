@@ -67,7 +67,7 @@ namespace CSP_futoshiki_skyscrapper.Utils
         #region FUTOSHIKI_LOADER_METHODS
         private void LoadDataForFutoshiki()
         {
-            string[] allLines = File.ReadAllLines(Utilities.FILE_NAME);
+            string[] allLines = File.ReadAllLines(FILE_NAME);
             int problemSize = int.Parse(allLines[0]);
             int counter = 2;        
 
@@ -100,17 +100,17 @@ namespace CSP_futoshiki_skyscrapper.Utils
             int xIndex2 = System.Convert.ToInt32(constraintLine[3]) - 65;
             int yIndex2 = int.Parse(constraintLine[4].ToString()) - 1;
 
-            futoshikiGraph.AddEdgeFromSource(xIndex1, yIndex1, xIndex2, yIndex2, GraphEdge<int>.EDGE_TYPE_ENUM.DESTINATION_GRATER);
-            futoshikiGraph.AddEdgeFromSource(xIndex2, yIndex2, xIndex1, yIndex1, GraphEdge<int>.EDGE_TYPE_ENUM.SOURCE_GREATER);
+            futoshikiGraph.AddEdgeFromSource(xIndex1, yIndex1, xIndex2, yIndex2, GraphEdge.EDGE_TYPE_ENUM.DESTINATION_GRATER);
+            futoshikiGraph.AddEdgeFromSource(xIndex2, yIndex2, xIndex1, yIndex1, GraphEdge.EDGE_TYPE_ENUM.SOURCE_GREATER);
 
         }
 
-        private GraphNode<int> ParseNode(string line, int x, int y)
+        private GraphNode ParseNode(string line, int x, int y)
         {
             int nodeValue = int.Parse(line);
             bool isMutable = (nodeValue == 0) ? true : false;
 
-            GraphNode<int> node = new GraphNode<int>(nodeValue, isMutable, x, y);
+            GraphNode node = new GraphNode(nodeValue, isMutable, x, y);
             return node;
         }
         #endregion

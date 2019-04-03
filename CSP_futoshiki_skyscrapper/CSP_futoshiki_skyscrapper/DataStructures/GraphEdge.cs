@@ -4,15 +4,15 @@ using System.Text;
 
 namespace CSP_futoshiki_skyscrapper.DataStructures
 {
-    class GraphEdge<T>
+    class GraphEdge
     {
         public enum EDGE_TYPE_ENUM { SOURCE_GREATER, DESTINATION_GRATER}
 
-        public GraphNode<T> sourceNode { get; set; }
-        public GraphNode<T> destinationNode { get; set; }
+        public GraphNode sourceNode { get; set; }
+        public GraphNode destinationNode { get; set; }
         public EDGE_TYPE_ENUM edgeType { get; set; }
 
-        public GraphEdge(GraphNode<T> sourceNode, GraphNode<T> destinationNode, EDGE_TYPE_ENUM edgeType)
+        public GraphEdge(GraphNode sourceNode, GraphNode destinationNode, EDGE_TYPE_ENUM edgeType)
         {
             this.sourceNode = sourceNode;
             this.destinationNode = destinationNode;
@@ -22,14 +22,14 @@ namespace CSP_futoshiki_skyscrapper.DataStructures
         public bool IsEdgeSatisfied()
         {
             if (edgeType == EDGE_TYPE_ENUM.DESTINATION_GRATER)
-                return sourceNode.CompareTo(destinationNode.data) < 0;
+                return destinationNode.IsGreaterThan(sourceNode.data);
             else
-                return destinationNode.CompareTo(sourceNode.data) < 0;
+                return sourceNode.IsGreaterThan(destinationNode.data);
         }
 
-        public GraphEdge<T> DeepClone()
+        public GraphEdge DeepClone()
         {
-            return new GraphEdge<T>(sourceNode, destinationNode, edgeType);
+            return new GraphEdge(sourceNode, destinationNode, edgeType);
         }
 
         public override string ToString()

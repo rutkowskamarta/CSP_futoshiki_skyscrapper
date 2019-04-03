@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Diagnostics;
 using static System.Console;
 using CSP_futoshiki_skyscrapper.DataStructures;
 using static CSP_futoshiki_skyscrapper.Utils.Utilities;
@@ -12,11 +13,12 @@ namespace CSP_futoshiki_skyscrapper.CSP
     class CSPBacktracking
     {
 
-        List<FutoshikiGraph> solutionsList;
+        List<ICSPSolvable> solutionsList;
+        Stopwatch stopwatch = new Stopwatch();
 
         public CSPBacktracking()
         {
-            solutionsList = new List<FutoshikiGraph>();
+            solutionsList = new List<ICSPSolvable>();
             if (GAME_TYPE == GAME_TYPE_ENUM.FUTOSHIKI)
             {
                 FutoshikiSolver();
@@ -25,44 +27,52 @@ namespace CSP_futoshiki_skyscrapper.CSP
             {
                 SkyscrapperSolver();
             }
+            
+
         }
 
         #region FUTOSHIKI
         private void FutoshikiSolver()
         {
-            FutoshikiGraph rootData = FutoshikiProblemSingleton.GetInstance().initialFutoshikiGraph.DeepClone();
+            stopwatch.Start();
+            ICSPSolvable rootData = FutoshikiProblemSingleton.GetInstance().initialFutoshikiGraph.DeepClone();
 
             CreateChildren(rootData);
             PrintAllSolutions();
-            
+            WriteLine("Koniec: " + stopwatch.ElapsedMilliseconds+" ms");
+            stopwatch.Stop();
         }
 
-        private void CreateChildren(FutoshikiGraph currentNode)
+        private void CreateChildren(ICSPSolvable currentNode)
         {
-            GraphNode<int> mostLimited = currentNode.ChooseTheMostLimitedAndNotSet();
+            CSPNode mostLimited = currentNode.ChooseTheMostLimitedAndNotSet();
 
             if (mostLimited == null)
                 CheckIfWonWhenNoElementsLeft(currentNode);
             else
             {
-                List<int> allPossibilities = currentNode.ReturnAllPossibilitiesForNode(mostLimited);
+                List<int> allPossibilities = currentNode.ReturnAllPossibilitiesForElement(mostLimited);
                 AddChildenForEveryPossibility(allPossibilities, currentNode, mostLimited);
             }
         }
 
-        private void CheckIfWonWhenNoElementsLeft(FutoshikiGraph currentNode)
+        private void CheckIfWonWhenNoElementsLeft(ICSPSolvable currentNode)
         {
-            if (currentNode.IsFutoshikiSolved())
+            if (currentNode.IsSolved())
             {
                 solutionsList.Add(currentNode);
+                WriteLine("ZNALAZŁEM!: "+ stopwatch.ElapsedMilliseconds+" ms");
+                currentNode.PrintAllElements();
+                WriteLine("================");
+
             }
         }
 
-        private void AddChildenForEveryPossibility(List<int> allPossibilities, FutoshikiGraph currentNode, GraphNode<int> mostLimited)
+        private void AddChildenForEveryPossibility(List<int> allPossibilities, ICSPSolvable currentNode, CSPNode mostLimited)
         {
             for (int i = 0; i < allPossibilities.Count; i++)
             {
-                FutoshikiGraph futoshikiGraphClone = currentNode.DeepClone();
+                ICSPSolvable futoshikiGraphClone = currentNode.DeepClone();
                 futoshikiGraphClone.AssignNewData(mostLimited.xIndex, mostLimited.yIndex, allPossibilities[i]);
                 CreateChildren(futoshikiGraphClone);
             }
