@@ -9,6 +9,9 @@
     <None Update="Data_bad\README.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Data_bad\test_futo_3_0.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Data_bad\test_futo_4_0.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

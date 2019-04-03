@@ -4,12 +4,13 @@ using System.Text;
 
 namespace CSP_futoshiki_skyscrapper.DataStructures
 {
-    class GraphNode<T>
+    class GraphNode<T> : IComparable<T>
     {
         public T data { get; set; }
         public bool isMutable { get; }
         public int xIndex { get; }
         public int yIndex { get; }
+        public int measure { get; set; }
         public List<GraphEdge<T>> outgoingEdges { get; set; } //krawędź wychodząca
 
         public GraphNode(T data, bool isMutable, int xIndex, int yIndex)
@@ -35,6 +36,7 @@ namespace CSP_futoshiki_skyscrapper.DataStructures
         {
             GraphNode<T> graphNode = new GraphNode<T>(data, isMutable, xIndex, yIndex);
             graphNode.outgoingEdges = new List<GraphEdge<T>>();
+            graphNode.measure = measure;
             foreach (var item in outgoingEdges)
             {
                 graphNode.outgoingEdges.Add(item.DeepClone());
@@ -42,7 +44,21 @@ namespace CSP_futoshiki_skyscrapper.DataStructures
             return graphNode;
         }
        
+        public bool AreConstraintsSatisfied()
+        {
+            for (int i = 0; i < outgoingEdges.Count; i++)
+            {
+                if (!outgoingEdges[i].IsEdgeSatisfied())
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
 
-        
+        public int CompareTo(T other)
+        {
+            return Comparer<T>.Default.Compare(data, other);
+        }
     }
 }

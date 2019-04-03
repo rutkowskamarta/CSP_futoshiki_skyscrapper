@@ -40,5 +40,17 @@ namespace CSP_futoshiki_skyscrapper.DataStructures
             return new GraphEdge<T>(sourceNode, destinationNode, edgeType);
         }
 
+        public bool IsEdgeSatisfied()
+        {
+            if(edgeType == EDGE_TYPE_ENUM.DESTINATION_GRATER)
+            {
+                return sourceNode.CompareTo(destinationNode.data) < 0;
+            }
+            else
+            {
+                return destinationNode.CompareTo(sourceNode.data) < 0;
+            }
+        }
+
     }
 }

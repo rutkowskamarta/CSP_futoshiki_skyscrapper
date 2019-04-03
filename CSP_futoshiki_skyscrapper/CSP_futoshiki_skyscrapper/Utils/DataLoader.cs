@@ -74,7 +74,7 @@ namespace CSP_futoshiki_skyscrapper.Utils
         {
             string[] allLines = File.ReadAllLines(Utilities.FILE_NAME);
             int problemSize = int.Parse(allLines[0]);
-            int counter = 2;
+            int counter = 2;        
 
             FutoshikiGraph futoshikiGraph = new FutoshikiGraph(problemSize);
             while (allLines[counter] != "REL:")
@@ -87,11 +87,11 @@ namespace CSP_futoshiki_skyscrapper.Utils
                 counter++;
             }
 
-            //Console.WriteLine("=========");
-            //futoshikiGraph.PrintAllElements();
-            //Console.WriteLine();
-            //futoshikiGraph.PrintAllElementsMutables();
-            //Console.WriteLine();
+            Console.WriteLine("=========");
+            futoshikiGraph.PrintAllElements();
+            Console.WriteLine();
+            futoshikiGraph.PrintAllElementsMutables();
+            Console.WriteLine();
 
             counter++;
 
@@ -110,9 +110,9 @@ namespace CSP_futoshiki_skyscrapper.Utils
 
             }
 
-            //futoshikiGraph.PrintAllConstraints();
+            futoshikiGraph.PrintAllConstraints();
             FutoshikiProblemSingleton.GetInstance().initialFutoshikiGraph = futoshikiGraph;
-
+            
         }
 
         private GraphNode<int> ParseNode(string line, int x, int y)

@@ -9,6 +9,7 @@ namespace CSP_futoshiki_skyscrapper.DataStructures
         public TreeNode<T> parent;
         public T data;
         public List<TreeNode<T>> children;
+        public bool isSolved = false;
 
         public TreeNode(TreeNode<T> parent, T data)
         {
@@ -20,6 +21,21 @@ namespace CSP_futoshiki_skyscrapper.DataStructures
         public void AddChild(T child)
         {
             children.Add(new TreeNode<T>(this, child));
+        }
+
+        public void AddChild(TreeNode<T> treeNode)
+        {
+            children.Add(treeNode);
+        }
+
+        public bool AreAllChildrenSolved()
+        {
+            for (int i = 0; i < children.Count; i++)
+            {
+                if (!children[i].isSolved)
+                    return false;
+            }
+            return true;
         }
 
     }

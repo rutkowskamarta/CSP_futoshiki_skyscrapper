@@ -28,6 +28,6 @@ namespace CSP_futoshiki_skyscrapper.DataStructures
             sourceNode.AddEdge(new GraphEdge<T>(sourceNode, destinationNode, edgeType));
         }
 
-        
+       
     }
 }
