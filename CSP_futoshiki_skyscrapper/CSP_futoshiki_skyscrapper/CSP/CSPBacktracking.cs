@@ -31,90 +31,55 @@ namespace CSP_futoshiki_skyscrapper.CSP
         private void FutoshikiSolver()
         {
             FutoshikiGraph rootData = FutoshikiProblemSingleton.GetInstance().initialFutoshikiGraph.DeepClone();
-            Tree<FutoshikiGraph> backtrackingTree = new Tree<FutoshikiGraph>(rootData);
 
-            CreateChildren(backtrackingTree.root);
+            CreateChildren(rootData);
             PrintAllSolutions();
             
         }
 
-        private void CreateChildren(TreeNode<FutoshikiGraph> currentNode)
+        private void CreateChildren(FutoshikiGraph currentNode)
         {
-            GraphNode<int> mostLimited = currentNode.data.ChooseTheMostLimitedAndNotSet();
+            GraphNode<int> mostLimited = currentNode.ChooseTheMostLimitedAndNotSet();
 
             if (mostLimited == null)
                 CheckIfWonWhenNoElementsLeft(currentNode);
             else
             {
-                List<int> allPossibilities = currentNode.data.ReturnAllPossibilitiesForNode(mostLimited);
+                List<int> allPossibilities = currentNode.ReturnAllPossibilitiesForNode(mostLimited);
                 AddChildenForEveryPossibility(allPossibilities, currentNode, mostLimited);
-                PropagateInformationOfSolutionInAnyChildToParent(currentNode);
             }
         }
 
-        private void CheckIfWonWhenNoElementsLeft(TreeNode<FutoshikiGraph> currentNode)
+        private void CheckIfWonWhenNoElementsLeft(FutoshikiGraph currentNode)
         {
-            if (currentNode.data.IsFutoshikiSolved())
+            if (currentNode.IsFutoshikiSolved())
             {
-                currentNode.isSolved = true;
-                currentNode.parent.isSolved = true;
-                solutionsList.Add(currentNode.data);
+                solutionsList.Add(currentNode);
             }
-            else
-                Backtracking(currentNode);
         }
 
-        private void Backtracking(TreeNode<FutoshikiGraph> currentNode)
-        {
-            currentNode.parent.children.Remove(currentNode);
-        }
-
-        private void AddChildenForEveryPossibility(List<int> allPossibilities, TreeNode<FutoshikiGraph> currentNode, GraphNode<int> mostLimited)
+        private void AddChildenForEveryPossibility(List<int> allPossibilities, FutoshikiGraph currentNode, GraphNode<int> mostLimited)
         {
             for (int i = 0; i < allPossibilities.Count; i++)
             {
-                FutoshikiGraph futoshikiGraphClone = currentNode.data.DeepClone();
+                FutoshikiGraph futoshikiGraphClone = currentNode.DeepClone();
                 futoshikiGraphClone.AssignNewData(mostLimited.xIndex, mostLimited.yIndex, allPossibilities[i]);
-                TreeNode<FutoshikiGraph> newChild = new TreeNode<FutoshikiGraph>(currentNode, futoshikiGraphClone);
-                currentNode.AddChild(newChild);
-                //rekurencja
-                CreateChildren(newChild);
+                CreateChildren(futoshikiGraphClone);
             }
         }
 
-        private void PropagateInformationOfSolutionInAnyChildToParent(TreeNode<FutoshikiGraph> currentNode)
-        {
-            if (currentNode.parent != null)
-            {
-                if (!currentNode.isSolved)
-                    Backtracking(currentNode);
-
-                else
-                {
-                    if (currentNode.parent != null)
-                        currentNode.parent.isSolved = true;
-                }
-            }
-        }
+        
         #endregion
 
         #region SKYSCRAPPER
         private void SkyscrapperSolver()
         {
             SkyscraperArray initialArray = new SkyscraperArray(SkyscraperProblemSingleton.problemSize);
-            Tree<SkyscraperArray> solutionsTree = new Tree<SkyscraperArray>(initialArray);
             //teraz znajdź pierwsze najbardziej ograniczone, wypełnij zgodnie z ograniczeniami i dołóż jako dziecko roota
 
         }
         
-        private TreeNode<SkyscraperArray> fillTheTree(TreeNode<SkyscraperArray> startingNode)
-        {
-            //trochę inaczaj, bo to znajdzie jedno
-            if (startingNode.data.IsSolved())
-                return startingNode;
-            return startingNode;
-
-        }
+       
         #endregion
 
         private void PrintAllSolutions()

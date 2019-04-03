@@ -8,7 +8,7 @@ namespace CSP_futoshiki_skyscrapper.Utils
     {
         public enum GAME_TYPE_ENUM { FUTOSHIKI, SKYSCRAPPER};
 
-        public const string FILE_NAME = @"Data_bad\test_futo_3_0.txt";
+        public const string FILE_NAME = @"Data_bad\test_futo_6_0.txt";
         public const GAME_TYPE_ENUM GAME_TYPE = GAME_TYPE_ENUM.FUTOSHIKI;
 
         public const string DATA_SEPARATOR = ";";

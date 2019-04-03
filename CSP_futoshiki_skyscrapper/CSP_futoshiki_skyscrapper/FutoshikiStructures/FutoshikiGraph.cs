@@ -39,43 +39,64 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
         {
             for (int i = 0; i < problemSize; i++)
             {
-                var columnElement = nodes[i, node.yIndex];
-                columnElement.domain.Remove(data);
+                if (i != node.xIndex)
+                {
+                    var columnElement = nodes[i, node.yIndex];
+                    if (columnElement.isMutable)
+                        columnElement.domain.Remove(data);
+                }
 
-                var rowElement = nodes[node.xIndex, i];
-                rowElement.domain.Remove(data);
+                if (i != node.yIndex)
+                {
+                    var rowElement = nodes[node.xIndex, i];
+                    if(rowElement.isMutable)
+                        rowElement.domain.Remove(data);
+                }
+                
             }
         }
 
         private void UpdateDomainsForConstraints(GraphNode<int> node, int data)
         {
+            
             for (int i = 0; i < node.outgoingEdges.Count; i++)
             {
+                List<int> domainItemsToRemove = new List<int>();
                 GraphEdge<int> outgoingEdge = node.outgoingEdges[i];
                 GraphNode<int> destination = outgoingEdge.destinationNode;
                 if (outgoingEdge.edgeType == GraphEdge<int>.EDGE_TYPE_ENUM.DESTINATION_GRATER)
                 {
                     for (int j = 0; j < destination.domain.Count; j++)
                     {
-                        if (destination.domain[j] < data)
-                            destination.domain.RemoveAt(j);
+                        if (destination.domain[j] < data && destination.isMutable)
+                            domainItemsToRemove.Add(destination.domain[j]);
                     }
                 }
                 else
                 {
                     for (int j = 0; j < destination.domain.Count; j++)
                     {
-                        if (destination.domain[j] > data)
-                            destination.domain.RemoveAt(j);
+                        if (destination.domain[j] > data && destination.isMutable)
+                            domainItemsToRemove.Add(destination.domain[j]);
                     }
                 }
-                
+
+                foreach (var item in domainItemsToRemove)
+                {
+                    destination.domain.Remove(item);
+                }
             }
         }
 
         public void InitializeAllDomains()
         {
-            nodes.OfType<GraphNode<int>>().AsParallel().ForAll(i=>i.InitializeDomain(problemSize));
+            for (int i = 0; i < problemSize; i++)
+            {
+                for (int j = 0; j < problemSize; j++)
+                {
+                    nodes[i, j].domain = ReturnAllPossibilitiesForNode(nodes[i, j]);
+                }
+            }
         }
 
         #region CLONING

@@ -10,7 +10,8 @@ namespace CSP_futoshiki_skyscrapper
         static void Main(string[] args)
         {
             DataLoader dataLoader = new DataLoader();
-            CSPBacktracking cSPBacktracking = new CSPBacktracking();
+            //CSPBacktracking cSPBacktracking = new CSPBacktracking();
+            CSPForwardChecking cSPForwardChecking = new CSPForwardChecking();
             ReadLine();
         }
 

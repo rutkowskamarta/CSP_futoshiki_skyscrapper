@@ -43,7 +43,7 @@ namespace CSP_futoshiki_skyscrapper.DataStructures
             GraphNode<T> graphNode = new GraphNode<T>(data, isMutable, xIndex, yIndex);
             graphNode.outgoingEdges = new List<GraphEdge<T>>();
             graphNode.measure = measure;
-            domain = new List<int>();
+            graphNode.domain = new List<int>();
             foreach (var item in outgoingEdges)
             {
                 graphNode.outgoingEdges.Add(item.DeepClone());
