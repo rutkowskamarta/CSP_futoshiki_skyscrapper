@@ -9,45 +9,39 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
     class SkyscraperArray : ICSPSolvable
     {
         public int arraySize { get; set; }
-        public SkyscraperNode[,] contentArray { get; set; }
+        public SkyscraperNode[,] nodes { get; set; }
 
         public SkyscraperArray(int arraySize)
         {
             this.arraySize = arraySize;
-            contentArray = new SkyscraperNode[arraySize, arraySize];
+            nodes = new SkyscraperNode[arraySize, arraySize];
 
-            //przerobić na linq
             for (int i = 0; i < arraySize; i++)
             {
-                //for (int j = 0; j < arraySize; j++)
-                    //contentArray[i, j] = new SkyscraperNode();
+                for (int j = 0; j < arraySize; j++)
+                    nodes[i, j] = new SkyscraperNode(0, i, j);
             }
             
         }
 
-        
-     
+      
 
-        public void PrintArrayNumbers()
+        public ICSPSolvable DeepClone()
         {
+            SkyscraperArray skyscraperArray = new SkyscraperArray(arraySize);
             for (int i = 0; i < arraySize; i++)
             {
                 for (int j = 0; j < arraySize; j++)
                 {
-                    Write($"{contentArray[i,j].data} ");
+                    skyscraperArray.nodes[i, j].data = nodes[i, j].data;
                 }
-                WriteLine();
             }
-        }
-
-        public ICSPSolvable DeepClone()
-        {
-            throw new NotImplementedException();
+            return skyscraperArray;
         }
 
         public void InitializeAllDomains()
         {
-            throw new NotImplementedException();
+            nodes.OfType<SkyscraperNode>().AsParallel().ForAll(i=>i.InitializeDomain(arraySize));
         }
 
         public void AssignNewDataAndUpdateDomains(int xIndex, int yIndex, int newData)
@@ -57,32 +51,297 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
 
         public List<int> ReturnAllPossibilitiesForElement(CSPNode element)
         {
-            throw new NotImplementedException();
+            List<int> allPossibilities = InitializeAllPossibilities();
+            //te rzutowanie i powielające się funkcje lepiej napisać można, zamiast interfejsu, klasa?
+            List<int> itemsToRemove = RepeatedPossibilitiesInColumnOrRowOfElement((SkyscraperNode)element, allPossibilities);
+            RemoveProperItemsFromAllPossibilities(allPossibilities, itemsToRemove);
+
+            //possibilities not fulfillng ma być abstract
+            var column = nodes.OfType<SkyscraperNode>().AsParallel().Select(i => i).Where(i => i.xIndex == element.xIndex).ToList();
+            if (column.Count(i => i.data != 0) == arraySize)
+            {
+
+                itemsToRemove = PossibilitiesNotFulfillingConstraintsColumn((SkyscraperNode)element, allPossibilities, column);
+                RemoveProperItemsFromAllPossibilities(allPossibilities, itemsToRemove);
+            }
+            
+            var row = nodes.OfType<SkyscraperNode>().AsParallel().Select(i => i).Where(i => i.yIndex == element.yIndex).ToList();
+            if (row.Count(i => i.data != 0) == arraySize)
+            {
+
+                itemsToRemove = PossibilitiesNotFulfillingConstraintsRow((SkyscraperNode)element, allPossibilities, row);
+                RemoveProperItemsFromAllPossibilities(allPossibilities, itemsToRemove);
+            }
+
+            return allPossibilities;
+        }
+        
+        private List<int> PossibilitiesNotFulfillingConstraintsColumn(SkyscraperNode element, List<int> allPossibilities,  List<SkyscraperNode> column)
+        {
+            List<int> itemsToRemove = new List<int>();
+            for (int i = 0; i < allPossibilities.Count; i++)
+            {
+                if (!AreAllColumnConstraintsSatisfied(element, allPossibilities[i], column))
+                {
+                    itemsToRemove.Add(element.data);
+                }
+            }
+            return itemsToRemove;
+
+        }
+
+
+        private List<int> PossibilitiesNotFulfillingConstraintsRow(SkyscraperNode element, List<int> allPossibilities, List<SkyscraperNode> row)
+        {
+            List<int> itemsToRemove = new List<int>();
+            for (int i = 0; i < allPossibilities.Count; i++)
+            {
+                if (!AreAllRowConstraintsSatisfied(element, allPossibilities[i], row))
+                {
+                    itemsToRemove.Add(element.data);
+                }
+            }
+            return itemsToRemove;
+
+        }
+
+        private bool AreAllColumnConstraintsSatisfied(SkyscraperNode element, int data,List<SkyscraperNode> column)
+        {
+            if (!CheckConstraint(element, data, SkyscraperProblemSingleton.CONSTRAINT_ENUM.LOOK_FROM_UPSIDE, column))
+                return false;
+            if (!CheckConstraint(element, data, SkyscraperProblemSingleton.CONSTRAINT_ENUM.LOOK_FROM_DOWNSIDE, column))
+                return false;
+
+            return true;   
+        }
+
+        private bool AreAllRowConstraintsSatisfied(SkyscraperNode element, int data, List<SkyscraperNode> row)
+        {
+            if (!CheckConstraint(element, data, SkyscraperProblemSingleton.CONSTRAINT_ENUM.LOOK_FROM_LEFT, row))
+                return false;
+            if (!CheckConstraint(element, data, SkyscraperProblemSingleton.CONSTRAINT_ENUM.LOOK_FROM_RIGHT, row))
+                return false;
+           
+
+            return true;
+        }
+
+
+        private bool CheckConstraint(SkyscraperNode element, int data, SkyscraperProblemSingleton.CONSTRAINT_ENUM constraintType, List<SkyscraperNode> rowOrColumn)
+        {
+            if(constraintType == SkyscraperProblemSingleton.CONSTRAINT_ENUM.LOOK_FROM_LEFT)
+            {
+                int constraint = SkyscraperProblemSingleton.leftContraints[element.yIndex];
+
+                if (constraint == 0)
+                    return true;
+                else
+                {
+                    rowOrColumn[element.xIndex].data = data;
+                    int howManyISee = HowManySkyscrapersIsee(rowOrColumn);
+                    rowOrColumn[element.xIndex].data = 0;
+                    return howManyISee == constraint;
+                }
+            }
+            else if (constraintType == SkyscraperProblemSingleton.CONSTRAINT_ENUM.LOOK_FROM_RIGHT)
+            {
+                int constraint = SkyscraperProblemSingleton.rightContraints[element.yIndex];
+
+                if (constraint == 0)
+                    return true;
+                else
+                {
+                    rowOrColumn[element.xIndex].data = data;
+                    var row = rowOrColumn.OrderByDescending(i => i.xIndex).ToList();
+                    int howManyISee = HowManySkyscrapersIsee(row);
+                    rowOrColumn[element.xIndex].data = 0;
+                    return howManyISee == constraint;
+                }
+            }
+            else if (constraintType == SkyscraperProblemSingleton.CONSTRAINT_ENUM.LOOK_FROM_UPSIDE)
+            {
+                int constraint = SkyscraperProblemSingleton.upperContraints[element.xIndex];
+                if (constraint == 0)
+                    return true;
+                else
+                {
+                    rowOrColumn[element.yIndex].data = data;
+                    int howManyISee = HowManySkyscrapersIsee(rowOrColumn);
+                    rowOrColumn[element.yIndex].data = 0;
+                    return howManyISee == constraint;
+                }
+            }
+            else
+            {
+                int constraint = SkyscraperProblemSingleton.lowerContraints[element.xIndex];
+                if (constraint == 0)
+                    return true;
+                else
+                {
+                    rowOrColumn[element.yIndex].data = data;
+                    var column = rowOrColumn.OrderByDescending(i => i.yIndex).ToList();
+                    int howManyISee = HowManySkyscrapersIsee(column);
+                    rowOrColumn[element.yIndex].data = 0;
+                    
+                    return howManyISee == constraint;
+                }
+            }
+        }
+
+        private int HowManySkyscrapersIsee(List<SkyscraperNode> rowOrColumn)
+        {
+            int howManyISee = 0;
+
+            int max = rowOrColumn[0].data;
+            for (int i = 0; i < rowOrColumn.Count; i++)
+            {
+                if (rowOrColumn[i].data >= max && rowOrColumn[i].data != 0)
+                {
+                    max = rowOrColumn[i].data;
+                    howManyISee++;
+                }
+            }
+            return howManyISee;
+        }
+
+        private List<int> InitializeAllPossibilities()
+        {
+            List<int> allPosibilites = new List<int>();
+            for (int i = 0; i < arraySize; i++)
+                allPosibilites.Add(i + 1);
+            return allPosibilites;
+        }
+
+        private List<int> RepeatedPossibilitiesInColumnOrRowOfElement(SkyscraperNode node, List<int> allPosibilites)
+        {
+            List<int> itemsToRemove = new List<int>();
+
+            for (int i = 0; i < arraySize; i++)
+            {
+                var columnElement = nodes[node.xIndex, i];
+                if (allPosibilites.Contains(columnElement.data))
+                    itemsToRemove.Add(columnElement.data);
+
+                var rowElement = nodes[i, node.yIndex];
+                if (allPosibilites.Contains(rowElement.data))
+                    itemsToRemove.Add(rowElement.data);
+            }
+
+            return itemsToRemove;
+        }
+
+        private void RemoveProperItemsFromAllPossibilities(List<int> allPosibilites, List<int> itemsToRemove)
+        {
+            for (int i = 0; i < itemsToRemove.Count; i++)
+                allPosibilites.Remove(itemsToRemove[i]);
         }
 
         public CSPNode ChooseTheMostLimitedAndNotSet()
         {
-            throw new NotImplementedException();
+            nodes.OfType<SkyscraperNode>().AsParallel().Where(i => i.data == 0).ForAll(i => i.measure = CalculateMeasure(i));
+            var ordered = nodes.OfType<SkyscraperNode>().OrderByDescending(i => i.measure).Where(i => i.data == 0).ToList();
+            if (ordered.Count == 0)
+                return null;
+            else
+                return ordered.First();
+        }
+
+        private int CalculateMeasure(SkyscraperNode node)
+        {
+            int rowMeasure = nodes.OfType<SkyscraperNode>().Where(i => i.yIndex == node.yIndex && i.data != 0).Count();
+            int columnMeasure = nodes.OfType<SkyscraperNode>().Where(i => i.xIndex == node.xIndex && i.data != 0).Count();
+            int constraintMeasure = 0;
+            if (SkyscraperProblemSingleton.leftContraints[node.yIndex] != 0)
+                constraintMeasure++;
+            if (SkyscraperProblemSingleton.rightContraints[node.yIndex] != 0)
+                constraintMeasure++;
+            if (SkyscraperProblemSingleton.upperContraints[node.xIndex] != 0)
+                constraintMeasure++;
+            if (SkyscraperProblemSingleton.lowerContraints[node.xIndex] != 0)
+                constraintMeasure++;
+            return rowMeasure + columnMeasure+constraintMeasure;
+        }
+
+        public void PrintArrayNumbers()
+        {
+            for (int i = 0; i < arraySize; i++)
+            {
+                for (int j = 0; j < arraySize; j++)
+                {
+                    Write($"{nodes[i, j].data} ");
+                }
+                WriteLine();
+            }
         }
 
         public void PrintAllElements()
         {
-            throw new NotImplementedException();
+            Write("  ");
+            for (int i = 0; i < arraySize; i++)
+                Write(SkyscraperProblemSingleton.upperContraints[i] +";");
+            WriteLine();
+            Write("  ");
+            for (int i = 0; i < arraySize; i++)
+                Write("--");
+            WriteLine();
+            for (int i = 0; i < arraySize; i++)
+            {
+                Write(SkyscraperProblemSingleton.leftContraints[i]+"|");
+                for (int j = 0; j < arraySize; j++)
+                    Write(nodes[i, j].data + ";");
+                Write("|"+ SkyscraperProblemSingleton.rightContraints[i]);
+                WriteLine();
+            }
+            Write("  ");
+            for (int i = 0; i < arraySize; i++)
+                Write("--");
+            WriteLine();
+            Write("  ");
+            for (int i = 0; i < arraySize; i++)
+                Write(SkyscraperProblemSingleton.lowerContraints[i] + ";");
+            WriteLine();
+            WriteLine();
         }
 
         public bool IsSolved()
         {
-            throw new NotImplementedException();
+            int howManyDownside = 0;
+            int howManyUpside = 0;
+            int howManyLeft = 0;
+            int howManyRight = 0;
+
+            for (int i = 0; i < arraySize; i++)
+            {
+                var column = nodes.OfType<SkyscraperNode>().AsParallel().Select(item => item).Where(item => item.xIndex == i).ToList();
+                var row = nodes.OfType<SkyscraperNode>().AsParallel().Select(item => item).Where(item => item.yIndex == i).ToList();
+
+                howManyDownside = HowManySkyscrapersIsee(column.OrderByDescending(item=>item.yIndex).ToList());
+                if (howManyDownside != SkyscraperProblemSingleton.lowerContraints[i] && SkyscraperProblemSingleton.lowerContraints[i]!=0)
+                    return false;
+
+                howManyUpside = HowManySkyscrapersIsee(column);
+                if (howManyUpside != SkyscraperProblemSingleton.upperContraints[i] && SkyscraperProblemSingleton.upperContraints[i] != 0)
+                    return false;
+                howManyLeft = HowManySkyscrapersIsee(row);
+                if (howManyLeft != SkyscraperProblemSingleton.leftContraints[i] && SkyscraperProblemSingleton.leftContraints[i] != 0)
+                    return false;
+                howManyRight = HowManySkyscrapersIsee(row.OrderByDescending(item => item.xIndex).ToList());
+                if (howManyRight != SkyscraperProblemSingleton.rightContraints[i] && SkyscraperProblemSingleton.rightContraints[i] != 0)
+                    return false;
+                
+            }
+
+            return true;
         }
 
         public bool IsAnyOfDomainsEmpty()
         {
-            throw new NotImplementedException();
+            return nodes.OfType<SkyscraperNode>().AsParallel().Any(i => i.domain.Count == 0);
         }
 
         public void AssignNewData(int xIndex, int yIndex, int newData)
         {
-            throw new NotImplementedException();
+            nodes[xIndex, yIndex].data = newData;
         }
     }
 }

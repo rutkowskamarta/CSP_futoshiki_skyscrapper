@@ -141,58 +141,58 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
 
         public List<int> ReturnAllPossibilitiesForElement(CSPNode element)
         {
-            List<int> allPosibilites = InitializeAllPossibilities();
-            List<int> itemsToRemove = RepeatedPossibilitiesInColumnOrRowOfElement((GraphNode)element, allPosibilites);
+            List<int> allPossibilites = InitializeAllPossibilities();
+            List<int> itemsToRemove = RepeatedPossibilitiesInColumnOrRowOfElement((GraphNode)element, allPossibilites);
 
-            RemoveProperItemsFromAllPossibilities(allPosibilites, itemsToRemove);
-            itemsToRemove = PossibilitiesNotFulfillingConstraints((GraphNode)element, allPosibilites);
+            RemoveProperItemsFromAllPossibilities(allPossibilites, itemsToRemove);
+            itemsToRemove = PossibilitiesNotFulfillingConstraints((GraphNode)element, allPossibilites);
 
-            RemoveProperItemsFromAllPossibilities(allPosibilites, itemsToRemove);
+            RemoveProperItemsFromAllPossibilities(allPossibilites, itemsToRemove);
 
-            return allPosibilites;
+            return allPossibilites;
 
         }
 
         private List<int> InitializeAllPossibilities()
         {
-            List<int> allPosibilites = new List<int>();
+            List<int> allPossibilites = new List<int>();
             for (int i = 0; i < problemSize; i++)
-                allPosibilites.Add(i + 1);
-            return allPosibilites;
+                allPossibilites.Add(i + 1);
+            return allPossibilites;
         }
 
-        private List<int> RepeatedPossibilitiesInColumnOrRowOfElement(GraphNode node, List<int> allPosibilites)
+        private List<int> RepeatedPossibilitiesInColumnOrRowOfElement(GraphNode node, List<int> allPossibilites)
         {
             List<int> itemsToRemove = new List<int>();
 
             for (int i = 0; i < problemSize; i++)
             {
                 var columnElement = nodes[i, node.yIndex];
-                if (allPosibilites.Contains(columnElement.data))
+                if (allPossibilites.Contains(columnElement.data))
                     itemsToRemove.Add(columnElement.data);
 
                 var rowElement = nodes[node.xIndex, i];
-                if (allPosibilites.Contains(rowElement.data))
+                if (allPossibilites.Contains(rowElement.data))
                     itemsToRemove.Add(rowElement.data);
             }
 
             return itemsToRemove;
         }
     
-        private void RemoveProperItemsFromAllPossibilities(List<int> allPosibilites, List<int> itemsToRemove)
+        private void RemoveProperItemsFromAllPossibilities(List<int> allPossibilites, List<int> itemsToRemove)
         {
             for (int i = 0; i < itemsToRemove.Count; i++)
-                allPosibilites.Remove(itemsToRemove[i]);
+                allPossibilites.Remove(itemsToRemove[i]);
         }
 
-        private List<int> PossibilitiesNotFulfillingConstraints(GraphNode node, List<int> allPosibilites)
+        private List<int> PossibilitiesNotFulfillingConstraints(GraphNode node, List<int> allPossibilites)
         {
             List<int> itemsToRemove = new List<int>();
             for (int i = 0; i < node.outgoingEdges.Count; i++)
             {
-                for (int j = 0; j < allPosibilites.Count; j++)
+                for (int j = 0; j < allPossibilites.Count; j++)
                 {
-                    CheckConstraint(node.outgoingEdges[i], allPosibilites[j], itemsToRemove);
+                    CheckConstraint(node.outgoingEdges[i], allPossibilites[j], itemsToRemove);
                 }
             }
             return itemsToRemove;

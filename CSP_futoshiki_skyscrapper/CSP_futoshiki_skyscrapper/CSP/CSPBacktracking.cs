@@ -15,31 +15,28 @@ namespace CSP_futoshiki_skyscrapper.CSP
 
         List<ICSPSolvable> solutionsList;
         Stopwatch stopwatch = new Stopwatch();
+        ICSPSolvable rootData;
 
         public CSPBacktracking()
         {
             solutionsList = new List<ICSPSolvable>();
             if (GAME_TYPE == GAME_TYPE_ENUM.FUTOSHIKI)
             {
-                FutoshikiSolver();
+                rootData = FutoshikiProblemSingleton.GetInstance().initialFutoshikiGraph.DeepClone();
             }
             else if(GAME_TYPE == GAME_TYPE_ENUM.SKYSCRAPPER)
             {
-                SkyscrapperSolver();
+                rootData = SkyscraperProblemSingleton.GetInstance().initialSkyscrapperArray.DeepClone();
             }
-            
-
+            Solver();
         }
 
-        #region FUTOSHIKI
-        private void FutoshikiSolver()
+        private void Solver()
         {
             stopwatch.Start();
-            ICSPSolvable rootData = FutoshikiProblemSingleton.GetInstance().initialFutoshikiGraph.DeepClone();
-
             CreateChildren(rootData);
             PrintAllSolutions();
-            WriteLine("Koniec: " + stopwatch.ElapsedMilliseconds+" ms");
+            WriteLine("Koniec: " + stopwatch.Elapsed.TotalMilliseconds + " ms");
             stopwatch.Stop();
         }
 
@@ -48,7 +45,9 @@ namespace CSP_futoshiki_skyscrapper.CSP
             CSPNode mostLimited = currentNode.ChooseTheMostLimitedAndNotSet();
 
             if (mostLimited == null)
+            {
                 CheckIfWonWhenNoElementsLeft(currentNode);
+            }
             else
             {
                 List<int> allPossibilities = currentNode.ReturnAllPossibilitiesForElement(mostLimited);
@@ -61,7 +60,8 @@ namespace CSP_futoshiki_skyscrapper.CSP
             if (currentNode.IsSolved())
             {
                 solutionsList.Add(currentNode);
-                WriteLine("ZNALAZŁEM!: "+ stopwatch.ElapsedMilliseconds+" ms");
+                currentNode.IsSolved();
+                WriteLine("ZNALAZŁEM!: "+ stopwatch.Elapsed.TotalMilliseconds+" ms");
                 currentNode.PrintAllElements();
                 WriteLine("================");
 
@@ -72,25 +72,14 @@ namespace CSP_futoshiki_skyscrapper.CSP
         {
             for (int i = 0; i < allPossibilities.Count; i++)
             {
-                ICSPSolvable futoshikiGraphClone = currentNode.DeepClone();
-                futoshikiGraphClone.AssignNewData(mostLimited.xIndex, mostLimited.yIndex, allPossibilities[i]);
-                CreateChildren(futoshikiGraphClone);
+                ICSPSolvable CSPNodeClone = currentNode.DeepClone();
+                CSPNodeClone.AssignNewData(mostLimited.xIndex, mostLimited.yIndex, allPossibilities[i]);
+                
+
+                CreateChildren(CSPNodeClone);
             }
         }
-
-        
-        #endregion
-
-        #region SKYSCRAPPER
-        private void SkyscrapperSolver()
-        {
-            SkyscraperArray initialArray = new SkyscraperArray(SkyscraperProblemSingleton.problemSize);
-            //teraz znajdź pierwsze najbardziej ograniczone, wypełnij zgodnie z ograniczeniami i dołóż jako dziecko roota
-
-        }
-        
-       
-        #endregion
+      
 
         private void PrintAllSolutions()
         {

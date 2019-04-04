@@ -39,16 +39,19 @@ namespace CSP_futoshiki_skyscrapper.Utils
         #region SKYSCRAPPER+LOADER_METHODS
         private void LoadDataForSkyscrapper()
         {
-            string[] allLines = File.ReadAllLines(Utilities.FILE_NAME);
+            string[] allLines = File.ReadAllLines(FILE_NAME);
 
             int problemSize = int.Parse(allLines[0]);
 
             SkyscraperProblemSingleton skyscraperProblem = SkyscraperProblemSingleton.GetInstance();
             skyscraperProblem.Initialize(problemSize);
+
             SkyscraperProblemSingleton.upperContraints = ParseConstraintLineForSkyscrapper(allLines[1], problemSize);
             SkyscraperProblemSingleton.lowerContraints = ParseConstraintLineForSkyscrapper(allLines[2], problemSize);
             SkyscraperProblemSingleton.leftContraints = ParseConstraintLineForSkyscrapper(allLines[3], problemSize);
             SkyscraperProblemSingleton.rightContraints = ParseConstraintLineForSkyscrapper(allLines[4], problemSize);
+
+            SkyscraperProblemSingleton.GetInstance().initialSkyscrapperArray.PrintAllElements();
         }
 
         private int[] ParseConstraintLineForSkyscrapper(string line, int problemSize)

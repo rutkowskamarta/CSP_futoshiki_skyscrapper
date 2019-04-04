@@ -7,7 +7,11 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
 {
     sealed class SkyscraperProblemSingleton
     {
+        public enum CONSTRAINT_ENUM {LOOK_FROM_LEFT, LOOK_FROM_RIGHT, LOOK_FROM_UPSIDE, LOOK_FROM_DOWNSIDE};
+
         private static SkyscraperProblemSingleton instance = null;
+
+        public SkyscraperArray initialSkyscrapperArray { get; set; }
 
         public static int problemSize { get; set; }
         public static int[] upperContraints { get; set; }
@@ -36,6 +40,8 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
             lowerContraints = new int[problemSize];
             leftContraints = new int[problemSize];
             rightContraints = new int[problemSize];
+
+            initialSkyscrapperArray = new SkyscraperArray(problemSize);
         }
 
         public void PrintConstraints()
@@ -57,5 +63,6 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
             }
             WriteLine();
         }
+        
     }
 }
