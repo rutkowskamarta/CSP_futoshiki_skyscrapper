@@ -35,6 +35,9 @@ namespace CSP_futoshiki_skyscrapper.CSP
         {
             stopwatch.Start();
             CreateChildren(rootData);
+            WriteLine();
+            WriteLine();
+            WriteLine("OSTATECZNE ROZWIĄZANIA");
             PrintAllSolutions();
             WriteLine("Koniec: " + stopwatch.Elapsed.TotalMilliseconds + " ms");
             stopwatch.Stop();

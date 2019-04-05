@@ -14,27 +14,25 @@ namespace CSP_futoshiki_skyscrapper.CSP
     {
         List<ICSPSolvable> solutionsList;
         Stopwatch stopwatch = new Stopwatch();
-
+        ICSPSolvable rootData;
 
         public CSPForwardChecking()
         {
             solutionsList = new List<ICSPSolvable>();
             if (GAME_TYPE == GAME_TYPE_ENUM.FUTOSHIKI)
             {
-                FutoshikiSolver();
+                rootData = FutoshikiProblemSingleton.GetInstance().initialFutoshikiGraph.DeepClone();
             }
             else if (GAME_TYPE == GAME_TYPE_ENUM.SKYSCRAPPER)
             {
-                SkyscrapperSolver();
+                rootData = SkyscraperProblemSingleton.GetInstance().initialSkyscrapperArray.DeepClone();
             }
-            
+            Solver();
         }
-
-        #region FUTOSHIKI
-        private void FutoshikiSolver()
+        
+        private void Solver()
         {
             stopwatch.Start();
-            ICSPSolvable rootData = FutoshikiProblemSingleton.GetInstance().initialFutoshikiGraph.DeepClone();
             rootData.InitializeAllDomains();
             CreateChildren(rootData);
             PrintAllSolutions();
@@ -59,12 +57,12 @@ namespace CSP_futoshiki_skyscrapper.CSP
         {
             for (int i = 0; i < allPossibilities.Count; i++)
             {
-                ICSPSolvable futoshikiGraphClone = currentNode.DeepClone();
-                futoshikiGraphClone.AssignNewDataAndUpdateDomains(mostLimited.xIndex, mostLimited.yIndex, allPossibilities[i]);
+                ICSPSolvable nodeClone = currentNode.DeepClone();
+                nodeClone.AssignNewDataAndUpdateDomains(mostLimited.xIndex, mostLimited.yIndex, allPossibilities[i]);
                 
-                if (!futoshikiGraphClone.IsAnyOfDomainsEmpty())
+                if (!nodeClone.IsAnyOfDomainsEmpty())
                 {
-                    CreateChildren(futoshikiGraphClone);
+                    CreateChildren(nodeClone);
                 }
             }
             
@@ -81,16 +79,6 @@ namespace CSP_futoshiki_skyscrapper.CSP
             }
         }
 
-        #endregion
-
-        #region SKYSCRAPPER
-        private void SkyscrapperSolver()
-        {
-
-
-        }
-
-        #endregion
 
         private void PrintAllSolutions()
         {

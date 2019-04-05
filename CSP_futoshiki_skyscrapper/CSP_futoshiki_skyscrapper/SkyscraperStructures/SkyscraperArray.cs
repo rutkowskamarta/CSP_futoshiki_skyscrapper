@@ -19,12 +19,10 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
             for (int i = 0; i < arraySize; i++)
             {
                 for (int j = 0; j < arraySize; j++)
-                    nodes[i, j] = new SkyscraperNode(0, i, j);
+                    nodes[j, i] = new SkyscraperNode(0, j, i);
             }
             
         }
-
-      
 
         public ICSPSolvable DeepClone()
         {
@@ -33,21 +31,63 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
             {
                 for (int j = 0; j < arraySize; j++)
                 {
-                    skyscraperArray.nodes[i, j].data = nodes[i, j].data;
+                    skyscraperArray.nodes[j, i].data = nodes[j, i].data;
                 }
             }
             return skyscraperArray;
         }
 
+        #region FORWARD_CHECKING_METHODS
+
         public void InitializeAllDomains()
         {
-            nodes.OfType<SkyscraperNode>().AsParallel().ForAll(i=>i.InitializeDomain(arraySize));
+            nodes.OfType<SkyscraperNode>().ToList().ForEach(i=>i.InitializeDomain(arraySize));
         }
 
         public void AssignNewDataAndUpdateDomains(int xIndex, int yIndex, int newData)
         {
-            throw new NotImplementedException();
+            nodes[xIndex, yIndex].data = newData;
+            UpdateAllDomains(nodes[xIndex, yIndex], newData);
         }
+
+        private void UpdateAllDomains(SkyscraperNode node, int newData)
+        {
+            UpdateDomainInRowsAndColumns(node, newData);
+            //UpdateDomainsForConstraints(node, newData);
+        }
+
+        private void UpdateDomainInRowsAndColumns(SkyscraperNode node, int data)
+        {
+            for (int i = 0; i < arraySize; i++)
+            {
+                if (i != node.xIndex)
+                {
+                    var columnElement = nodes[node.xIndex, i];
+                    if(columnElement.data==0)
+                        columnElement.domain.Remove(data);
+                }
+
+                if (i != node.yIndex)
+                {
+                    var rowElement = nodes[i, node.yIndex];
+                    if(rowElement.data==0)
+                        rowElement.domain.Remove(data);
+                }
+
+            }
+        }
+
+        private void UpdateDomainsForConstraints(SkyscraperNode node, int data)
+        {
+           
+            
+        }
+
+        public bool IsAnyOfDomainsEmpty()
+        {
+            return nodes.OfType<SkyscraperNode>().AsParallel().Any(i => i.domain.Count == 0);
+        }
+        #endregion
 
         public List<int> ReturnAllPossibilitiesForElement(CSPNode element)
         {
@@ -57,7 +97,7 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
             RemoveProperItemsFromAllPossibilities(allPossibilities, itemsToRemove);
 
             //possibilities not fulfillng ma być abstract
-            var column = nodes.OfType<SkyscraperNode>().AsParallel().Select(i => i).Where(i => i.xIndex == element.xIndex).ToList();
+            var column = nodes.OfType<SkyscraperNode>().Select(i => i).Where(i => i.xIndex == element.xIndex).ToList();
             if (column.Count(i => i.data != 0) == arraySize)
             {
 
@@ -65,7 +105,7 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
                 RemoveProperItemsFromAllPossibilities(allPossibilities, itemsToRemove);
             }
             
-            var row = nodes.OfType<SkyscraperNode>().AsParallel().Select(i => i).Where(i => i.yIndex == element.yIndex).ToList();
+            var row = nodes.OfType<SkyscraperNode>().Select(i => i).Where(i => i.yIndex == element.yIndex).ToList();
             if (row.Count(i => i.data != 0) == arraySize)
             {
 
@@ -89,7 +129,6 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
             return itemsToRemove;
 
         }
-
 
         private List<int> PossibilitiesNotFulfillingConstraintsRow(SkyscraperNode element, List<int> allPossibilities, List<SkyscraperNode> row)
         {
@@ -126,7 +165,6 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
             return true;
         }
 
-
         private bool CheckConstraint(SkyscraperNode element, int data, SkyscraperProblemSingleton.CONSTRAINT_ENUM constraintType, List<SkyscraperNode> rowOrColumn)
         {
             if(constraintType == SkyscraperProblemSingleton.CONSTRAINT_ENUM.LOOK_FROM_LEFT)
@@ -152,7 +190,7 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
                 else
                 {
                     rowOrColumn[element.xIndex].data = data;
-                    var row = rowOrColumn.OrderByDescending(i => i.xIndex).ToList();
+                    var row = rowOrColumn.AsParallel().OrderByDescending(i => i.xIndex).ToList();
                     int howManyISee = HowManySkyscrapersIsee(row);
                     rowOrColumn[element.xIndex].data = 0;
                     return howManyISee == constraint;
@@ -179,7 +217,7 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
                 else
                 {
                     rowOrColumn[element.yIndex].data = data;
-                    var column = rowOrColumn.OrderByDescending(i => i.yIndex).ToList();
+                    var column = rowOrColumn.AsParallel().OrderByDescending(i => i.yIndex).ToList();
                     int howManyISee = HowManySkyscrapersIsee(column);
                     rowOrColumn[element.yIndex].data = 0;
                     
@@ -238,8 +276,8 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
 
         public CSPNode ChooseTheMostLimitedAndNotSet()
         {
-            nodes.OfType<SkyscraperNode>().AsParallel().Where(i => i.data == 0).ForAll(i => i.measure = CalculateMeasure(i));
-            var ordered = nodes.OfType<SkyscraperNode>().OrderByDescending(i => i.measure).Where(i => i.data == 0).ToList();
+            nodes.OfType<SkyscraperNode>().Where(i => i.data == 0).ToList().ForEach(i => i.measure = CalculateMeasure(i));
+            var ordered = nodes.OfType<SkyscraperNode>().Select(i => i).Where(i => i.data == 0).OrderByDescending(i => i.measure).ToList();
             if (ordered.Count == 0)
                 return null;
             else
@@ -248,8 +286,8 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
 
         private int CalculateMeasure(SkyscraperNode node)
         {
-            int rowMeasure = nodes.OfType<SkyscraperNode>().Where(i => i.yIndex == node.yIndex && i.data != 0).Count();
-            int columnMeasure = nodes.OfType<SkyscraperNode>().Where(i => i.xIndex == node.xIndex && i.data != 0).Count();
+            int rowMeasure = nodes.OfType<SkyscraperNode>().Select(i=>i).Where(i => i.yIndex == node.yIndex && i.data != 0).Count();
+            int columnMeasure = nodes.OfType<SkyscraperNode>().Select(i => i).Where(i => i.xIndex == node.xIndex && i.data != 0).Count();
             int constraintMeasure = 0;
             if (SkyscraperProblemSingleton.leftContraints[node.yIndex] != 0)
                 constraintMeasure++;
@@ -262,13 +300,53 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
             return rowMeasure + columnMeasure+constraintMeasure;
         }
 
+        
+        public bool IsSolved()
+        {
+            int howManyDownside = 0;
+            int howManyUpside = 0;
+            int howManyLeft = 0;
+            int howManyRight = 0;
+
+            for (int i = 0; i < arraySize; i++)
+            {
+                var column = nodes.OfType<SkyscraperNode>().Select(item => item).Where(item => item.xIndex == i).ToList();
+                var row = nodes.OfType<SkyscraperNode>().Select(item => item).Where(item => item.yIndex == i).ToList();
+
+                howManyDownside = HowManySkyscrapersIsee(column.OrderByDescending(item=>item.yIndex).ToList());
+                if (SkyscraperProblemSingleton.lowerContraints[i] != 0 && howManyDownside != SkyscraperProblemSingleton.lowerContraints[i])
+                    return false;
+
+                howManyUpside = HowManySkyscrapersIsee(column);
+                if (SkyscraperProblemSingleton.upperContraints[i] != 0 && howManyUpside != SkyscraperProblemSingleton.upperContraints[i] )
+                    return false;
+                howManyLeft = HowManySkyscrapersIsee(row);
+                if (SkyscraperProblemSingleton.leftContraints[i] != 0 && howManyLeft != SkyscraperProblemSingleton.leftContraints[i] )
+                    return false;
+                howManyRight = HowManySkyscrapersIsee(row.OrderByDescending(item => item.xIndex).ToList());
+                if (SkyscraperProblemSingleton.rightContraints[i] != 0 && howManyRight != SkyscraperProblemSingleton.rightContraints[i])
+                    return false;
+                
+            }
+
+            return true;
+        }
+
+        
+
+        public void AssignNewData(int xIndex, int yIndex, int newData)
+        {
+            nodes[xIndex, yIndex].data = newData;
+        }
+
+        #region PRINTING
         public void PrintArrayNumbers()
         {
             for (int i = 0; i < arraySize; i++)
             {
                 for (int j = 0; j < arraySize; j++)
                 {
-                    Write($"{nodes[i, j].data} ");
+                    Write($"{nodes[j, i].data} ");
                 }
                 WriteLine();
             }
@@ -278,7 +356,7 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
         {
             Write("  ");
             for (int i = 0; i < arraySize; i++)
-                Write(SkyscraperProblemSingleton.upperContraints[i] +";");
+                Write(SkyscraperProblemSingleton.upperContraints[i] + ";");
             WriteLine();
             Write("  ");
             for (int i = 0; i < arraySize; i++)
@@ -286,10 +364,10 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
             WriteLine();
             for (int i = 0; i < arraySize; i++)
             {
-                Write(SkyscraperProblemSingleton.leftContraints[i]+"|");
+                Write(SkyscraperProblemSingleton.leftContraints[i] + "|");
                 for (int j = 0; j < arraySize; j++)
-                    Write(nodes[i, j].data + ";");
-                Write("|"+ SkyscraperProblemSingleton.rightContraints[i]);
+                    Write(nodes[j, i].data + ";");
+                Write("|" + SkyscraperProblemSingleton.rightContraints[i]);
                 WriteLine();
             }
             Write("  ");
@@ -302,46 +380,6 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
             WriteLine();
             WriteLine();
         }
-
-        public bool IsSolved()
-        {
-            int howManyDownside = 0;
-            int howManyUpside = 0;
-            int howManyLeft = 0;
-            int howManyRight = 0;
-
-            for (int i = 0; i < arraySize; i++)
-            {
-                var column = nodes.OfType<SkyscraperNode>().AsParallel().Select(item => item).Where(item => item.xIndex == i).ToList();
-                var row = nodes.OfType<SkyscraperNode>().AsParallel().Select(item => item).Where(item => item.yIndex == i).ToList();
-
-                howManyDownside = HowManySkyscrapersIsee(column.OrderByDescending(item=>item.yIndex).ToList());
-                if (howManyDownside != SkyscraperProblemSingleton.lowerContraints[i] && SkyscraperProblemSingleton.lowerContraints[i]!=0)
-                    return false;
-
-                howManyUpside = HowManySkyscrapersIsee(column);
-                if (howManyUpside != SkyscraperProblemSingleton.upperContraints[i] && SkyscraperProblemSingleton.upperContraints[i] != 0)
-                    return false;
-                howManyLeft = HowManySkyscrapersIsee(row);
-                if (howManyLeft != SkyscraperProblemSingleton.leftContraints[i] && SkyscraperProblemSingleton.leftContraints[i] != 0)
-                    return false;
-                howManyRight = HowManySkyscrapersIsee(row.OrderByDescending(item => item.xIndex).ToList());
-                if (howManyRight != SkyscraperProblemSingleton.rightContraints[i] && SkyscraperProblemSingleton.rightContraints[i] != 0)
-                    return false;
-                
-            }
-
-            return true;
-        }
-
-        public bool IsAnyOfDomainsEmpty()
-        {
-            return nodes.OfType<SkyscraperNode>().AsParallel().Any(i => i.domain.Count == 0);
-        }
-
-        public void AssignNewData(int xIndex, int yIndex, int newData)
-        {
-            nodes[xIndex, yIndex].data = newData;
-        }
+        #endregion
     }
 }

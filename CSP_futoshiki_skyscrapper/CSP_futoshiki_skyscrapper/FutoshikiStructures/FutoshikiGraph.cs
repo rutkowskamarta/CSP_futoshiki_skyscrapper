@@ -14,14 +14,11 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
 
         public FutoshikiGraph(int problemSize) : base(problemSize){}
 
+        #region FORWARD_CHECKING_METHODS
+
         public bool IsAnyOfDomainsEmpty()
         {
             return nodes.OfType<GraphNode>().AsParallel().Any(i => i.domain.Count== 0);
-        }
-
-        public void AssignNewData(int xIndex, int yIndex, int newData)
-        {
-            nodes[xIndex, yIndex].data = newData;
         }
 
         public void AssignNewDataAndUpdateDomains(int xIndex, int yIndex, int newData)
@@ -98,6 +95,12 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
                     nodes[i, j].domain = ReturnAllPossibilitiesForElement(nodes[i, j]);
                 }
             }
+        }
+        #endregion
+
+        public void AssignNewData(int xIndex, int yIndex, int newData)
+        {
+            nodes[xIndex, yIndex].data = newData;
         }
 
         #region CLONING

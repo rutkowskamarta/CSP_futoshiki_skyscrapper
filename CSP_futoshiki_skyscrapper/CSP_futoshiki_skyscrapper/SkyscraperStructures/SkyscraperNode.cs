@@ -7,7 +7,7 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
 {
     class SkyscraperNode : CSPNode
     {
-        public SkyscraperNode(int data, int xIndex, int yIndex) : base(data, false, xIndex, yIndex)
+        public SkyscraperNode(int data, int xIndex, int yIndex) : base(data, true, xIndex, yIndex)
         {
         }
 
