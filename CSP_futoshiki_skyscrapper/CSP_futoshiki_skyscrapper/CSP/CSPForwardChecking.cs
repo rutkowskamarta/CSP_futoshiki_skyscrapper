@@ -35,9 +35,10 @@ namespace CSP_futoshiki_skyscrapper.CSP
             stopwatch.Start();
             rootData.InitializeAllDomains();
             CreateChildren(rootData);
-            PrintAllSolutions();
-            WriteLine("Koniec: " + stopwatch.ElapsedMilliseconds + " ms");
             stopwatch.Stop();
+
+            PrintAllSolutions();
+            WriteLine("Koniec: " + stopwatch.Elapsed.TotalMilliseconds + " ms");
         }
 
         private void CreateChildren(ICSPSolvable currentNode)
@@ -73,7 +74,7 @@ namespace CSP_futoshiki_skyscrapper.CSP
             if (currentNode.IsSolved())
             {
                 solutionsList.Add(currentNode);
-                WriteLine("ZNALAZŁEM!: "+stopwatch.ElapsedMilliseconds+" ms");
+                WriteLine("ZNALAZŁEM teraz takie: " + stopwatch.Elapsed.TotalMilliseconds + " ms");
                 currentNode.PrintAllElements();
                 WriteLine("================");
             }
@@ -82,6 +83,12 @@ namespace CSP_futoshiki_skyscrapper.CSP
 
         private void PrintAllSolutions()
         {
+            WriteLine();
+            WriteLine();
+            WriteLine("=========================");
+            WriteLine("OSTATECZNE ROZWIĄZANIA");
+            WriteLine("=========================");
+            WriteLine();
             foreach (var item in solutionsList)
             {
                 item.PrintAllElements();

@@ -225,6 +225,7 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
                 return ordered.First();
         }
 
+       
         public bool IsSolved()
         {
 

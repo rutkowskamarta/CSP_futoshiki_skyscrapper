@@ -53,7 +53,6 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
         private void UpdateAllDomains(SkyscraperNode node, int newData)
         {
             UpdateDomainInRowsAndColumns(node, newData);
-            //UpdateDomainsForConstraints(node, newData);
         }
 
         private void UpdateDomainInRowsAndColumns(SkyscraperNode node, int data)
@@ -76,13 +75,7 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
 
             }
         }
-
-        private void UpdateDomainsForConstraints(SkyscraperNode node, int data)
-        {
-           
-            
-        }
-
+               
         public bool IsAnyOfDomainsEmpty()
         {
             return nodes.OfType<SkyscraperNode>().AsParallel().Any(i => i.domain.Count == 0);
@@ -284,6 +277,7 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
                 return ordered.First();
         }
 
+        
         private int CalculateMeasure(SkyscraperNode node)
         {
             int rowMeasure = nodes.OfType<SkyscraperNode>().Select(i=>i).Where(i => i.yIndex == node.yIndex && i.data != 0).Count();
