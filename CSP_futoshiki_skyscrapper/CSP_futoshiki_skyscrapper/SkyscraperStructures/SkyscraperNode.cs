@@ -17,7 +17,7 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
             skyscraperNode.domain = new List<int>();
             for (int i = 0; i < domain.Count; i++)
             {
-                skyscraperNode.domain[i] = domain[i];
+                skyscraperNode.domain.Add(domain[i]);
             }
             return skyscraperNode;
         }

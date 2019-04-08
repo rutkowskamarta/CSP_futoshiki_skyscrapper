@@ -13,12 +13,18 @@ namespace CSP_futoshiki_skyscrapper.CSP
     class CSPForwardChecking
     {
         List<ICSPSolvable> solutionsList;
+        List<int> numberOfIterationsPerSolution;
+        List<int> timePerSolution;
         Stopwatch stopwatch = new Stopwatch();
         ICSPSolvable rootData;
-
+        int numberOfIterations = 0;
+        
         public CSPForwardChecking()
         {
             solutionsList = new List<ICSPSolvable>();
+            timePerSolution = new List<int>();
+            numberOfIterationsPerSolution = new List<int>();
+
             if (GAME_TYPE == GAME_TYPE_ENUM.FUTOSHIKI)
             {
                 rootData = FutoshikiProblemSingleton.GetInstance().initialFutoshikiGraph.DeepClone();
@@ -43,6 +49,7 @@ namespace CSP_futoshiki_skyscrapper.CSP
 
         private void CreateChildren(ICSPSolvable currentNode)
         {
+            //numberOfIterations++;
             CSPNode mostLimited = currentNode.ChooseTheMostLimitedAndNotSet();
 
             if (mostLimited == null)

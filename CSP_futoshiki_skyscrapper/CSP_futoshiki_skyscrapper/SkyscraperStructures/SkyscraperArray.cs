@@ -31,7 +31,7 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
             {
                 for (int j = 0; j < arraySize; j++)
                 {
-                    skyscraperArray.nodes[j, i].data = nodes[j, i].data;
+                    skyscraperArray.nodes[j, i] = (SkyscraperNode)nodes[j,i].DeepClone();
                 }
             }
             return skyscraperArray;
@@ -41,13 +41,21 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
 
         public void InitializeAllDomains()
         {
-            nodes.OfType<SkyscraperNode>().ToList().ForEach(i=>i.InitializeDomain(arraySize));
+            for (int i = 0; i < arraySize; i++)
+            {
+                for (int j = 0; j < arraySize; j++)
+                {
+                    nodes[i, j].InitializeDomain(arraySize);
+                   
+                }
+            }
         }
 
         public void AssignNewDataAndUpdateDomains(int xIndex, int yIndex, int newData)
         {
             nodes[xIndex, yIndex].data = newData;
             UpdateAllDomains(nodes[xIndex, yIndex], newData);
+            
         }
 
         private void UpdateAllDomains(SkyscraperNode node, int newData)
@@ -59,20 +67,19 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
         {
             for (int i = 0; i < arraySize; i++)
             {
-                if (i != node.xIndex)
+                if (i != node.yIndex)
                 {
                     var columnElement = nodes[node.xIndex, i];
                     if(columnElement.data==0)
                         columnElement.domain.Remove(data);
                 }
 
-                if (i != node.yIndex)
+                if (i != node.xIndex)
                 {
                     var rowElement = nodes[i, node.yIndex];
                     if(rowElement.data==0)
                         rowElement.domain.Remove(data);
                 }
-
             }
         }
                
@@ -277,6 +284,7 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
                 return ordered.First();
         }
 
+        //tu dopisać drugą heurystykę, może greedy
         
         private int CalculateMeasure(SkyscraperNode node)
         {
