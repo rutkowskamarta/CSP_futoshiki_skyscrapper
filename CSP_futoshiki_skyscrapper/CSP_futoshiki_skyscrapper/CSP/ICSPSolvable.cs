@@ -11,7 +11,7 @@ namespace CSP_futoshiki_skyscrapper.CSP
         void InitializeAllDomains();
         void AssignNewDataAndUpdateDomains(int xIndex, int yIndex, int newData);
         List<int> ReturnAllPossibilitiesForElement(CSPNode element);
-        CSPNode ChooseTheMostLimitedAndNotSet();
+        CSPNode ChooseElementByHeuristics();
         bool IsSolved();
         bool IsAnyOfDomainsEmpty();
         void PrintAllElements();

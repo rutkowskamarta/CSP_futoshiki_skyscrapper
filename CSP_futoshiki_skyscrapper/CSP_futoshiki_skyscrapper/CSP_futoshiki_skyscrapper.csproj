@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NAudio" Version="1.8.5" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Data_bad\README.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -172,6 +176,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Data_test\skyscrapper_5_4.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="sound.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

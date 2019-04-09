@@ -65,3 +65,4 @@ C:\Users\marar\Desktop\GitHub\AI_CSP\CSP_futoshiki_skyscrapper\CSP_futoshiki_sky
 C:\Users\marar\Desktop\GitHub\AI_CSP\CSP_futoshiki_skyscrapper\CSP_futoshiki_skyscrapper\obj\Debug\netcoreapp2.1\CSP_futoshiki_skyscrapper.dll
 C:\Users\marar\Desktop\GitHub\AI_CSP\CSP_futoshiki_skyscrapper\CSP_futoshiki_skyscrapper\obj\Debug\netcoreapp2.1\CSP_futoshiki_skyscrapper.pdb
 C:\Users\marar\Desktop\GitHub\AI_CSP\CSP_futoshiki_skyscrapper\CSP_futoshiki_skyscrapper\bin\Debug\netcoreapp2.1\Data_bad\test_futo_3_0.txt
+C:\Users\marar\Desktop\GitHub\AI_CSP\CSP_futoshiki_skyscrapper\CSP_futoshiki_skyscrapper\bin\Debug\netcoreapp2.1\sound.wav

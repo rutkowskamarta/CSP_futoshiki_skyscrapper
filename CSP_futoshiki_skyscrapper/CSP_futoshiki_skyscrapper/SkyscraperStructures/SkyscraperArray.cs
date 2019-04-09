@@ -4,10 +4,15 @@ using System.Text;
 using static System.Console;
 using System.Linq;
 using CSP_futoshiki_skyscrapper.CSP;
+using static CSP_futoshiki_skyscrapper.Utils.Utilities;
+
 namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
 {
     class SkyscraperArray : ICSPSolvable
     {
+        private delegate CSPNode choosingVariableHeuristicsDelegate();
+        private choosingVariableHeuristicsDelegate choosingVariableHeuristicsMethod;
+
         public int arraySize { get; set; }
         public SkyscraperNode[,] nodes { get; set; }
 
@@ -20,6 +25,15 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
             {
                 for (int j = 0; j < arraySize; j++)
                     nodes[j, i] = new SkyscraperNode(0, j, i);
+            }
+
+            if(HEURISTIC_TYPE == HEURISTIC_TYPE_ENUM.GREEDY)
+            {
+                choosingVariableHeuristicsMethod = ChooseFirstNotSet;
+            }
+            else if(HEURISTIC_TYPE == HEURISTIC_TYPE_ENUM.MOST_LIMITING)
+            {
+                choosingVariableHeuristicsMethod = ChooseTheMostLimitedAndNotSet;
             }
             
         }
@@ -274,7 +288,12 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
                 allPosibilites.Remove(itemsToRemove[i]);
         }
 
-        public CSPNode ChooseTheMostLimitedAndNotSet()
+        public CSPNode ChooseElementByHeuristics()
+        {
+            return choosingVariableHeuristicsMethod();
+        }
+
+        private CSPNode ChooseTheMostLimitedAndNotSet()
         {
             nodes.OfType<SkyscraperNode>().Where(i => i.data == 0).ToList().ForEach(i => i.measure = CalculateMeasure(i));
             var ordered = nodes.OfType<SkyscraperNode>().Select(i => i).Where(i => i.data == 0).OrderByDescending(i => i.measure).ToList();
@@ -282,6 +301,16 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
                 return null;
             else
                 return ordered.First();
+        }
+
+        private CSPNode ChooseFirstNotSet()
+        {
+            var nodesList = nodes.OfType<SkyscraperNode>().Where(i => i.data == 0).ToList();
+            if (nodesList.Count == 0)
+                return null;
+            else
+                return nodesList.First();
+
         }
 
         //tu dopisać drugą heurystykę, może greedy
@@ -333,8 +362,6 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
 
             return true;
         }
-
-        
 
         public void AssignNewData(int xIndex, int yIndex, int newData)
         {

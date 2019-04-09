@@ -43,7 +43,7 @@ namespace CSP_futoshiki_skyscrapper.CSP
 
         private void CreateChildren(ICSPSolvable currentNode)
         {
-            CSPNode mostLimited = currentNode.ChooseTheMostLimitedAndNotSet();
+            CSPNode mostLimited = currentNode.ChooseElementByHeuristics();
 
             if (mostLimited == null)
             {

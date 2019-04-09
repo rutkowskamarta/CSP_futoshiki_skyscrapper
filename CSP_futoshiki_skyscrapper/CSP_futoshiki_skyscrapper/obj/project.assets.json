@@ -193,6 +193,15 @@
           "lib/netstandard1.0/_._": {}
         }
       },
+      "NAudio/1.8.5": {
+        "type": "package",
+        "compile": {
+          "lib/net35/NAudio.dll": {}
+        },
+        "runtime": {
+          "lib/net35/NAudio.dll": {}
+        }
+      },
       "NETStandard.Library/2.0.3": {
         "type": "package",
         "dependencies": {
@@ -553,6 +562,22 @@
         "version.txt"
       ]
     },
+    "NAudio/1.8.5": {
+      "sha512": "ATbzKXZtbyXKnNfHlpPC+SLGnX9pqZ4/YQfL9Vd1CPYdBgw0v2vas5s0ZhLpFyimt3n3hYvyElyarowpeaO+Tg==",
+      "type": "package",
+      "path": "naudio/1.8.5",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net35/NAudio.XML",
+        "lib/net35/NAudio.dll",
+        "lib/uap10.0/NAudio.Universal.XML",
+        "lib/uap10.0/NAudio.Universal.dll",
+        "license.txt",
+        "naudio.1.8.5.nupkg.sha512",
+        "naudio.nuspec"
+      ]
+    },
     "NETStandard.Library/2.0.3": {
       "sha512": "st47PosZSHrjECdjeIzZQbzivYBJFv6P2nv4cj2ypdI204DO+vZ7l5raGMiX4eXMJ53RfOIg+/s4DHVZ54Nu2A==",
       "type": "package",
@@ -684,7 +709,8 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.1": [
-      "Microsoft.NETCore.App >= 2.1.0"
+      "Microsoft.NETCore.App >= 2.1.0",
+      "NAudio >= 1.8.5"
     ]
   },
   "packageFolders": {
@@ -732,6 +758,10 @@
             "target": "Package",
             "version": "[2.1.0, )",
             "autoReferenced": true
+          },
+          "NAudio": {
+            "target": "Package",
+            "version": "[1.8.5, )"
           }
         },
         "imports": [
@@ -741,5 +771,17 @@
         "warn": true
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'NAudio 1.8.5' was restored using '.NETFramework,Version=v4.6.1' instead of the project target framework '.NETCoreApp,Version=v2.1'. This package may not be fully compatible with your project.",
+      "libraryId": "NAudio",
+      "targetGraphs": [
+        ".NETCoreApp,Version=v2.1"
+      ]
+    }
+  ]
 }

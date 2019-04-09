@@ -5,14 +5,30 @@ using CSP_futoshiki_skyscrapper.DataStructures;
 using static System.Console;
 using System.Linq;
 using CSP_futoshiki_skyscrapper.CSP;
+using static CSP_futoshiki_skyscrapper.Utils.Utilities;
 
 namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
 {
     class FutoshikiGraph : Graph, ICSPSolvable
     {
+        private delegate CSPNode choosingVariableHeuristicsDelegate();
+        private choosingVariableHeuristicsDelegate choosingVariableHeuristicsMethod;
+
+        private bool firstIteration = true;
+
         public override GraphNode[,] nodes { get => base.nodes; set => base.nodes = value; }
 
-        public FutoshikiGraph(int problemSize) : base(problemSize){}
+        public FutoshikiGraph(int problemSize) : base(problemSize)
+        {
+            if (HEURISTIC_TYPE == HEURISTIC_TYPE_ENUM.GREEDY)
+            {
+                choosingVariableHeuristicsMethod = ChooseFirstNotSet;
+            }
+            else if (HEURISTIC_TYPE == HEURISTIC_TYPE_ENUM.MOST_LIMITING)
+            {
+                choosingVariableHeuristicsMethod = ChooseTheMostLimitedAndNotSet;
+            }
+        }
 
         #region FORWARD_CHECKING_METHODS
 
@@ -93,8 +109,10 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
                 for (int j = 0; j < problemSize; j++)
                 {
                     nodes[i, j].domain = ReturnAllPossibilitiesForElement(nodes[i, j]);
+
                 }
             }
+            firstIteration = false;
         }
         #endregion
 
@@ -193,12 +211,29 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
             List<int> itemsToRemove = new List<int>();
             for (int i = 0; i < node.outgoingEdges.Count; i++)
             {
+                if(firstIteration)
+                    RemoveInitialNotFulfillingConstraints(node.outgoingEdges[i], itemsToRemove, allPossibilites);
+
                 for (int j = 0; j < allPossibilites.Count; j++)
                 {
                     CheckConstraint(node.outgoingEdges[i], allPossibilites[j], itemsToRemove);
                 }
             }
             return itemsToRemove;
+        }
+
+        private void RemoveInitialNotFulfillingConstraints(GraphEdge graphEdge, List<int> itemsToRemove, List<int> allPossibilites)
+        {
+            if (graphEdge.edgeType == GraphEdge.EDGE_TYPE_ENUM.DESTINATION_GRATER)
+            {
+                if (allPossibilites.Contains(problemSize + 1))
+                    itemsToRemove.Add(allPossibilites.Find(item => item == problemSize + 1));
+            }
+            else
+            {
+                if (allPossibilites.Contains(1))
+                    itemsToRemove.Add(allPossibilites.Find(item => item == 1));
+            }
         }
 
         private void CheckConstraint(GraphEdge graphEdge, int possibility, List<int> itemsToRemove)
@@ -215,7 +250,13 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
             }
         }
 
-        public CSPNode ChooseTheMostLimitedAndNotSet()
+        public CSPNode ChooseElementByHeuristics()
+        {
+            return choosingVariableHeuristicsMethod();
+        }
+
+
+        private CSPNode ChooseTheMostLimitedAndNotSet()
         {
             nodes.OfType<GraphNode>().AsParallel().Where(i=>i.data==0).ForAll(i => i.measure = CalculateMeasure(i));
             var ordered = nodes.OfType<GraphNode>().OrderByDescending(i => i.measure).Where(i => i.data == 0).ToList();
@@ -225,7 +266,12 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
                 return ordered.First();
         }
 
-       
+        private CSPNode ChooseFirstNotSet()
+        {
+            return nodes.OfType<GraphNode>().Where(i => i.data == 0).ToList().First();
+        }
+
+
         public bool IsSolved()
         {
 
