@@ -30,7 +30,8 @@ namespace CSP_futoshiki_skyscrapper.Utils
         public static void SaveStatisticsToFile(string method, List<CsvStatistics> statisticsList)
         {
             string problemName = FILE_NAME.Substring(8, FILE_NAME.Length - 4-8);
-            using (var writer = new StreamWriter($"{CSV_SAVE_LOCATION_STATISTICS}{problemName}-{method}-{DateTime.Now.ToFileTime()}{CSV_FILE_EXTENSION}", true))
+            string heuristicName = HEURISTIC_TYPE.ToString();
+            using (var writer = new StreamWriter($"{CSV_SAVE_LOCATION_STATISTICS}{problemName}-{method}-{heuristicName}-{DateTime.Now.ToFileTime()}{CSV_FILE_EXTENSION}", true))
             using (var csv = new CsvWriter(writer))
             {
                 csv.WriteComment("STATYSTYKI");
@@ -41,5 +42,9 @@ namespace CSP_futoshiki_skyscrapper.Utils
             }
         }
 
+        public static void SaveAllSolutionsToHtmlFile()
+        {
+            
+        }
     }
 }
