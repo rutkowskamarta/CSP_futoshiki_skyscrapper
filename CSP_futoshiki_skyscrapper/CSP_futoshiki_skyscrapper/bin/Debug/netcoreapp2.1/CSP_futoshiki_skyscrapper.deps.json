@@ -1,19 +1,33 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.1",
-    "signature": "382a08f17d4ae2e86b1a74cd66e20bc5aaed4620"
+    "signature": "b4b524ea1a3ee90e4fd6cabaac1464bdbf7cfe6e"
   },
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v2.1": {
       "CSP_futoshiki_skyscrapper/1.0.0": {
         "dependencies": {
+          "CsvHelper": "12.1.2",
           "NAudio": "1.8.5"
         },
         "runtime": {
           "CSP_futoshiki_skyscrapper.dll": {}
         }
       },
+      "CsvHelper/12.1.2": {
+        "dependencies": {
+          "Microsoft.CSharp": "4.4.0",
+          "System.Reflection.TypeExtensions": "4.4.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/CsvHelper.dll": {
+            "assemblyVersion": "12.0.0.0",
+            "fileVersion": "12.0.0.0"
+          }
+        }
+      },
+      "Microsoft.CSharp/4.4.0": {},
       "NAudio/1.8.5": {
         "runtime": {
           "lib/net35/NAudio.dll": {
@@ -21,7 +35,8 @@
             "fileVersion": "1.8.5.0"
           }
         }
-      }
+      },
+      "System.Reflection.TypeExtensions/4.4.0": {}
     }
   },
   "libraries": {
@@ -30,12 +45,33 @@
       "serviceable": false,
       "sha512": ""
     },
+    "CsvHelper/12.1.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-SpMsKw74xuAMsYZ+tSQsHF9UYlZm6E+LBSwDPukGCy1dYLVJwM6ZR7gFhKWDMh7OR/1ba8t4UV/RraMJKx+mog==",
+      "path": "csvhelper/12.1.2",
+      "hashPath": "csvhelper.12.1.2.nupkg.sha512"
+    },
+    "Microsoft.CSharp/4.4.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-vvVR/B08YVghQ4jHEloxqw2ZWzEGE1AOA5E0DioUM3ujbXz6FD3AfB/0Jl2ohJPd0nXYGwmPe1En6HTsSriq1A==",
+      "path": "microsoft.csharp/4.4.0",
+      "hashPath": "microsoft.csharp.4.4.0.nupkg.sha512"
+    },
     "NAudio/1.8.5": {
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-ATbzKXZtbyXKnNfHlpPC+SLGnX9pqZ4/YQfL9Vd1CPYdBgw0v2vas5s0ZhLpFyimt3n3hYvyElyarowpeaO+Tg==",
       "path": "naudio/1.8.5",
       "hashPath": "naudio.1.8.5.nupkg.sha512"
+    },
+    "System.Reflection.TypeExtensions/4.4.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-dkmh/ySlwnXJp/1qYP9uyKkCK1CXR/REFzl7abHcArxBcV91mY2CgrrzSRA5Z/X4MevJWwXsklGRdR3A7K9zbg==",
+      "path": "system.reflection.typeextensions/4.4.0",
+      "hashPath": "system.reflection.typeextensions.4.4.0.nupkg.sha512"
     }
   }
 }

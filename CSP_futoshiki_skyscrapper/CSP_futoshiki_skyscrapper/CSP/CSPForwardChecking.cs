@@ -7,23 +7,23 @@ using CSP_futoshiki_skyscrapper.DataStructures;
 using static CSP_futoshiki_skyscrapper.Utils.Utilities;
 using CSP_futoshiki_skyscrapper.SkyscraperStructures;
 using CSP_futoshiki_skyscrapper.FutoshikiStructures;
+using CSP_futoshiki_skyscrapper.Utils;
 
 namespace CSP_futoshiki_skyscrapper.CSP
 {
     class CSPForwardChecking
     {
-        List<ICSPSolvable> solutionsList;
-        List<int> numberOfIterationsPerSolution;
-        List<int> timePerSolution;
-        Stopwatch stopwatch = new Stopwatch();
-        ICSPSolvable rootData;
-        int numberOfIterations = 0;
+        private List<ICSPSolvable> solutionsList;
+        private List<CsvStatistics> statisticsList;
+
+        private Stopwatch stopwatch = new Stopwatch();
+        private ICSPSolvable rootData;
+        private int numberOfIterations = 0;
         
         public CSPForwardChecking()
         {
             solutionsList = new List<ICSPSolvable>();
-            timePerSolution = new List<int>();
-            numberOfIterationsPerSolution = new List<int>();
+            statisticsList = new List<CsvStatistics>();
 
             if (GAME_TYPE == GAME_TYPE_ENUM.FUTOSHIKI)
             {
@@ -45,11 +45,13 @@ namespace CSP_futoshiki_skyscrapper.CSP
 
             PrintAllSolutions();
             WriteLine("Koniec: " + stopwatch.Elapsed.TotalMilliseconds + " ms");
+            statisticsList.Add(new CsvStatistics(0, 0, 0, stopwatch.Elapsed.TotalMilliseconds, numberOfIterations));
+            SaveStatisticsToFile("forward-checking", statisticsList);
         }
 
         private void CreateChildren(ICSPSolvable currentNode)
         {
-            //numberOfIterations++;
+            numberOfIterations++;
             CSPNode mostLimited = currentNode.ChooseElementByHeuristics();
 
             if (mostLimited == null)
@@ -80,6 +82,7 @@ namespace CSP_futoshiki_skyscrapper.CSP
         {
             if (currentNode.IsSolved())
             {
+                statisticsList.Add(new CsvStatistics(statisticsList.Count+1, numberOfIterations, stopwatch.Elapsed.TotalMilliseconds, 0, 0));
                 solutionsList.Add(currentNode);
                 WriteLine("ZNALAZŁEM teraz takie: " + stopwatch.Elapsed.TotalMilliseconds + " ms");
                 currentNode.PrintAllElements();
