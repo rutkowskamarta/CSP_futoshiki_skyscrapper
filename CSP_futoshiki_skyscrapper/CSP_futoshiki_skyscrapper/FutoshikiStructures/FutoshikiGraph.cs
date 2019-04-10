@@ -28,6 +28,10 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
             {
                 choosingVariableHeuristicsMethod = ChooseTheMostLimitedAndNotSet;
             }
+            else if(HEURISTIC_TYPE == HEURISTIC_TYPE_ENUM.SMALL_DOMAIN_AND_MANY_CONSTRAINTS)
+            {
+                choosingVariableHeuristicsMethod = ChooseTheSmallestDomainAndGreatestConstraints;
+            }
         }
 
         #region FORWARD_CHECKING_METHODS
@@ -258,7 +262,7 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
 
         private CSPNode ChooseTheMostLimitedAndNotSet()
         {
-            nodes.OfType<GraphNode>().AsParallel().Where(i=>i.data==0).ForAll(i => i.measure = CalculateMeasure(i));
+            nodes.OfType<GraphNode>().AsParallel().Where(i=>i.data==0).ForAll(i => i.measure = CalculateMeasureMostLimited(i));
             var ordered = nodes.OfType<GraphNode>().OrderByDescending(i => i.measure).Where(i => i.data == 0).ToList();
             if(ordered.Count == 0)
                 return null;
@@ -271,6 +275,18 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
             return nodes.OfType<GraphNode>().Where(i => i.data == 0).ToList().First();
         }
 
+        private CSPNode ChooseTheSmallestDomainAndGreatestConstraints()
+        {
+
+            var ordered = nodes.OfType<GraphNode>().Select(item=>item).Where(item=>item.data==0).OrderBy(i => i.domain.Count).ToList();
+            if (ordered.Count == 0)
+                return null;
+            var elementsWithSmallestDomain = ordered.Select(item => item).Where(item => item.domain.Count == ordered[0].domain.Count);
+            var elementsOrdered = elementsWithSmallestDomain.OrderByDescending(item => item.outgoingEdges.Count);
+            return elementsOrdered.First();
+
+            //tutuutututu return ordered.First();
+        }
 
         public bool IsSolved()
         {
@@ -295,7 +311,7 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
             return true;
         }
 
-        private int CalculateMeasure(GraphNode node)
+        private int CalculateMeasureMostLimited(GraphNode node)
         {
             int rowMeasure = nodes.OfType<GraphNode>().Where(i => i.xIndex == node.xIndex && i.data != 0).Count();
             int columnMeasure = nodes.OfType<GraphNode>().Where(i => i.yIndex == node.yIndex && i.data != 0).Count();
@@ -303,61 +319,72 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
             return rowMeasure + columnMeasure + constraintMeasure;
         }
 
+      
+
         #region PRINTING
         public override string ToString()
         {
             StringBuilder stringBuilder = new StringBuilder();
-            
+
             for (int i = 0; i < problemSize; i++)
             {
+                StringBuilder stringBuilderLower = new StringBuilder();
+
                 for (int j = 0; j < problemSize; j++)
                 {
-                    stringBuilder.Append(nodes[i, j].data +";");
+                    stringBuilder.Append(nodes[i, j].data);
+
+                    GraphEdge leftEdge = null;
+                    for (int k = 0; k < nodes[i,j].outgoingEdges.Count; k++)
+                    {
+                        if(nodes[i,j].outgoingEdges[k].destinationNode.xIndex == nodes[i,j].xIndex && nodes[i, j].outgoingEdges[k].destinationNode.yIndex == nodes[i, j].yIndex + 1)
+                            leftEdge = nodes[i, j].outgoingEdges[k];
+                    }
+
+                    if (leftEdge == null)
+                        stringBuilder.Append("   ");
+                    else
+                    {
+                        if (leftEdge.edgeType == GraphEdge.EDGE_TYPE_ENUM.DESTINATION_GRATER)
+                            stringBuilder.Append(" < ");
+                        else
+                            stringBuilder.Append(" > ");
+
+                    }
+
+                    GraphEdge lowerEdge = null;
+                    for (int k = 0; k < nodes[i, j].outgoingEdges.Count; k++)
+                    {
+                        if (nodes[i, j].outgoingEdges[k].destinationNode.yIndex == nodes[i, j].yIndex && nodes[i, j].outgoingEdges[k].destinationNode.xIndex == nodes[i, j].xIndex + 1)
+                            lowerEdge = nodes[i, j].outgoingEdges[k];
+                    }
+
+                    if (lowerEdge == null)
+                        stringBuilderLower.Append("    ");
+                    else
+                    {
+                        if (lowerEdge.edgeType == GraphEdge.EDGE_TYPE_ENUM.DESTINATION_GRATER)
+                            stringBuilderLower.Append("^   ");
+                        else
+                            stringBuilderLower.Append("v   ");
+                    }
                 }
-                stringBuilder.Append("=");
+                stringBuilder.Append("\n");
+                stringBuilder.Append(stringBuilderLower.ToString()+"\n");
+                stringBuilderLower.Clear();
+
             }
             return stringBuilder.ToString();
         }
 
         public void PrintAllElements()
         {
-            for (int i = 0; i < problemSize; i++)
-            {
-                for (int j = 0; j < problemSize; j++)
-                {
-                    Write(nodes[i,j].data+" ");
-                }
-                WriteLine();
-            }
+            WriteLine(ToString());
         }
 
-        public void PrintAllElementsMutables()
-        {
-            for (int i = 0; i < problemSize; i++)
-            {
-                for (int j = 0; j < problemSize; j++)
-                {
-                    Write(nodes[i,j].isMutable+" ");
-                }
-                WriteLine();
-            }
-        }
+       
 
-        public void PrintAllConstraints()
-        {
-            for (int i = 0; i < problemSize; i++)
-            {
-                for (int j = 0; j < problemSize; j++)
-                {
-                    WriteLine("NODE: " + nodes[i, j].data + ": ");
-                    foreach (var item in nodes[i, j].outgoingEdges)
-                    {
-                        WriteLine(item.ToString());
-                    }
-                    WriteLine("---------");
-                }
-            }
-        }
+       
         #endregion
     }
 }

@@ -35,6 +35,10 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
             {
                 choosingVariableHeuristicsMethod = ChooseTheMostLimitedAndNotSet;
             }
+            else if(HEURISTIC_TYPE == HEURISTIC_TYPE_ENUM.SMALL_DOMAIN_AND_MANY_CONSTRAINTS)
+            {
+                choosingVariableHeuristicsMethod = ChooseTheSmallestDomainAndGreatestConstraints;
+            }
             
         }
 
@@ -313,8 +317,19 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
 
         }
 
+        private CSPNode ChooseTheSmallestDomainAndGreatestConstraints()
+        {
+
+            var ordered = nodes.OfType<SkyscraperNode>().OrderBy(i => i.domain.Count).ToList();
+            if (ordered.Count == 0)
+                return null;
+            var elementsWithSmallestDomain = ordered.Select(item => item).Where(item => item.domain == ordered[0].domain);
+            return elementsWithSmallestDomain.First();
+
+            //tutuutututu return ordered.First();
+        }
         //tu dopisać drugą heurystykę, może greedy
-        
+
         private int CalculateMeasure(SkyscraperNode node)
         {
             int rowMeasure = nodes.OfType<SkyscraperNode>().Select(i=>i).Where(i => i.yIndex == node.yIndex && i.data != 0).Count();
@@ -368,46 +383,43 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
             nodes[xIndex, yIndex].data = newData;
         }
 
-        #region PRINTING
-        public void PrintArrayNumbers()
+        public override string ToString()
         {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.Append("  ");
+            for (int i = 0; i < arraySize; i++)
+                stringBuilder.Append(SkyscraperProblemSingleton.upperContraints[i] + ";");
+            stringBuilder.Append("\n");
+            stringBuilder.Append("  ");
+            for (int i = 0; i < arraySize; i++)
+                stringBuilder.Append("--");
+            stringBuilder.Append("\n");
             for (int i = 0; i < arraySize; i++)
             {
+                stringBuilder.Append(SkyscraperProblemSingleton.leftContraints[i] + "|");
                 for (int j = 0; j < arraySize; j++)
-                {
-                    Write($"{nodes[j, i].data} ");
-                }
-                WriteLine();
+                    stringBuilder.Append(nodes[j, i].data + ";");
+                stringBuilder.Append("|" + SkyscraperProblemSingleton.rightContraints[i]);
+                stringBuilder.Append("\n");
             }
+            stringBuilder.Append("  ");
+            for (int i = 0; i < arraySize; i++)
+                stringBuilder.Append("--");
+            stringBuilder.Append("\n");
+            stringBuilder.Append("  ");
+            for (int i = 0; i < arraySize; i++)
+                stringBuilder.Append(SkyscraperProblemSingleton.lowerContraints[i] + ";");
+            stringBuilder.Append("\n");
+            stringBuilder.Append("\n");
+            return stringBuilder.ToString();
         }
+
+        #region PRINTING
+        
 
         public void PrintAllElements()
         {
-            Write("  ");
-            for (int i = 0; i < arraySize; i++)
-                Write(SkyscraperProblemSingleton.upperContraints[i] + ";");
-            WriteLine();
-            Write("  ");
-            for (int i = 0; i < arraySize; i++)
-                Write("--");
-            WriteLine();
-            for (int i = 0; i < arraySize; i++)
-            {
-                Write(SkyscraperProblemSingleton.leftContraints[i] + "|");
-                for (int j = 0; j < arraySize; j++)
-                    Write(nodes[j, i].data + ";");
-                Write("|" + SkyscraperProblemSingleton.rightContraints[i]);
-                WriteLine();
-            }
-            Write("  ");
-            for (int i = 0; i < arraySize; i++)
-                Write("--");
-            WriteLine();
-            Write("  ");
-            for (int i = 0; i < arraySize; i++)
-                Write(SkyscraperProblemSingleton.lowerContraints[i] + ";");
-            WriteLine();
-            WriteLine();
+            WriteLine(ToString());
         }
         #endregion
     }

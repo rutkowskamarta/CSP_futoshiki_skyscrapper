@@ -47,6 +47,7 @@ namespace CSP_futoshiki_skyscrapper.CSP
             WriteLine("Koniec: " + stopwatch.Elapsed.TotalMilliseconds + " ms");
             statisticsList.Add(new CsvStatistics(0, 0, 0, stopwatch.Elapsed.TotalMilliseconds, numberOfIterations));
             SaveStatisticsToFile("forward-checking", statisticsList);
+            SaveAllSolutionsToTxtFile("forward-checking", solutionsList);
         }
 
         private void CreateChildren(ICSPSolvable currentNode)

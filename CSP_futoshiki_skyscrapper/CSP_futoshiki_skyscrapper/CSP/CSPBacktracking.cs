@@ -48,6 +48,7 @@ namespace CSP_futoshiki_skyscrapper.CSP
             PrintAllSolutions();
             WriteLine("Koniec: " + stopwatch.Elapsed.TotalMilliseconds + " ms");
             SaveStatisticsToFile("back-tracking", statisticsList);
+            SaveAllSolutionsToTxtFile("back-tracking", solutionsList);
         }
 
         private void CreateChildren(ICSPSolvable currentNode)
