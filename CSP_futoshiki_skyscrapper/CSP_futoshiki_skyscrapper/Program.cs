@@ -11,16 +11,21 @@ namespace CSP_futoshiki_skyscrapper
         static void Main(string[] args)
         {
             DataLoader dataLoader = new DataLoader();
-            
-            //CSPBacktracking cSPBacktracking = new CSPBacktracking();
 
+            if (Utilities.ALGORITHM_TYPE == Utilities.ALGORITHM_TYPE_ENUM.BACKTRACKING)
+            {
+                CSPBacktracking cSPBacktracking = new CSPBacktracking();
 
-            CSPForwardChecking cSPForwardChecking = new CSPForwardChecking();
+            }
+            else if (Utilities.ALGORITHM_TYPE == Utilities.ALGORITHM_TYPE_ENUM.FORWARD_CHECKING)
+            {
+                CSPForwardChecking cSPForwardChecking = new CSPForwardChecking();
 
+            }
 
             WriteLine("finished!");
             PlayFinishSound();
-            ReadLine();
+            //ReadLine();
         }
 
         private static void PlayFinishSound()

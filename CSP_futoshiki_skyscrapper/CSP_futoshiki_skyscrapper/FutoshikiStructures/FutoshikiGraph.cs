@@ -108,6 +108,8 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
 
         public void InitializeAllDomains()
         {
+            //nodes.OfType<GraphNode>().AsParallel().ForAll(item=> item.domain = ReturnAllPossibilitiesForElement(item));
+            //nodes.OfType<GraphNode>().ToList().ForEach(item=> item.domain = ReturnAllPossibilitiesForElement(item));
             for (int i = 0; i < problemSize; i++)
             {
                 for (int j = 0; j < problemSize; j++)
@@ -275,23 +277,44 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
             return nodes.OfType<GraphNode>().Where(i => i.data == 0).ToList().First();
         }
 
+        //tylko dla forward checking! to chyba pora to wyrzucić
         private CSPNode ChooseTheSmallestDomainAndGreatestConstraints()
         {
-
-            var ordered = nodes.OfType<GraphNode>().Select(item=>item).Where(item=>item.data==0).OrderBy(i => i.domain.Count).ToList();
+            List<GraphNode> ordered;
+            if (ALGORITHM_TYPE == ALGORITHM_TYPE_ENUM.FORWARD_CHECKING)
+            {
+                ordered = nodes.OfType<GraphNode>().Select(item => item).Where(item => item.data == 0).OrderBy(i => i.domain.Count).ToList();
+            }
+            else
+            {
+                nodes.OfType<GraphNode>().OfType<GraphNode>().ToList().ForEach(item => item.measure = ReturnAllPossibilitiesForElement(item).Count);
+                ordered = nodes.OfType<GraphNode>().Select(item => item).Where(item => item.data == 0).OrderBy(item => item.measure).ToList();
+            }
             if (ordered.Count == 0)
                 return null;
-            var elementsWithSmallestDomain = ordered.Select(item => item).Where(item => item.domain.Count == ordered[0].domain.Count);
+
+            List<GraphNode> elementsWithSmallestDomain;
+
+            if (ALGORITHM_TYPE == ALGORITHM_TYPE_ENUM.FORWARD_CHECKING)
+            {
+                elementsWithSmallestDomain = ordered.Select(item => item).Where(item => item.domain.Count == ordered[0].domain.Count).ToList();
+            }
+            else
+            {
+                elementsWithSmallestDomain = ordered.Select(item => item).Where(item => item.measure == ordered[0].measure).ToList();
+            }
+
             var elementsOrdered = elementsWithSmallestDomain.OrderByDescending(item => item.outgoingEdges.Count);
             return elementsOrdered.First();
 
-            //tutuutututu return ordered.First();
         }
 
         public bool IsSolved()
         {
 
+
             if (nodes.OfType<GraphNode>().AsParallel().Any(i => i.data == 0))
+            //if (nodes.OfType<GraphNode>().Any(i => i.data == 0))
             {
                 return false;
             }

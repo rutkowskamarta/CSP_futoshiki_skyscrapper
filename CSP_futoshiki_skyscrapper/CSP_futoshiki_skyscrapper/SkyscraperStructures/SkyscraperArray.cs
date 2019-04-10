@@ -319,14 +319,20 @@ namespace CSP_futoshiki_skyscrapper.SkyscraperStructures
 
         private CSPNode ChooseTheSmallestDomainAndGreatestConstraints()
         {
-
-            var ordered = nodes.OfType<SkyscraperNode>().OrderBy(i => i.domain.Count).ToList();
+            List<SkyscraperNode> ordered;
+            if (ALGORITHM_TYPE == ALGORITHM_TYPE_ENUM.FORWARD_CHECKING)
+            {
+                ordered = nodes.OfType<SkyscraperNode>().Select(item => item).Where(item => item.data == 0).OrderBy(i => i.domain.Count).ToList();
+            }
+            else
+            {
+                ordered = nodes.OfType<SkyscraperNode>().Select(item => item).Where(item => item.data == 0).OrderBy(item => ReturnAllPossibilitiesForElement(item).Count).ToList();
+            }
             if (ordered.Count == 0)
                 return null;
-            var elementsWithSmallestDomain = ordered.Select(item => item).Where(item => item.domain == ordered[0].domain);
-            return elementsWithSmallestDomain.First();
+            return ordered.First();
 
-            //tutuutututu return ordered.First();
+
         }
         //tu dopisać drugą heurystykę, może greedy
 
