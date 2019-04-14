@@ -33,13 +33,11 @@ namespace CSP_futoshiki_skyscrapper.DataStructures
             graphNode.measure = measure;
             graphNode.domain = new List<int>();
             foreach (var item in outgoingEdges)
-            {
                 graphNode.outgoingEdges.Add(item.DeepClone());
-            }
+
             for (int i = 0; i < domain.Count; i++)
-            {
                 graphNode.domain.Add(domain[i]);
-            }
+
             return graphNode;
         }
        
@@ -48,9 +46,7 @@ namespace CSP_futoshiki_skyscrapper.DataStructures
             for (int i = 0; i < outgoingEdges.Count; i++)
             {
                 if (!outgoingEdges[i].IsEdgeSatisfied())
-                {
                     return false;
-                }
             }
             return true;
         }

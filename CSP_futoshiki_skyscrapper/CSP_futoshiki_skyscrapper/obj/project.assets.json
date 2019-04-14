@@ -897,11 +897,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\marar\\Desktop\\GitHub\\AI_CSP\\CSP_futoshiki_skyscrapper\\CSP_futoshiki_skyscrapper\\CSP_futoshiki_skyscrapper.csproj",
+      "projectUniqueName": "C:\\Users\\marar\\Desktop\\GitHub\\AI_CSP\\AI_CSP\\AI_CSP\\CSP_futoshiki_skyscrapper\\CSP_futoshiki_skyscrapper\\CSP_futoshiki_skyscrapper.csproj",
       "projectName": "CSP_futoshiki_skyscrapper",
-      "projectPath": "C:\\Users\\marar\\Desktop\\GitHub\\AI_CSP\\CSP_futoshiki_skyscrapper\\CSP_futoshiki_skyscrapper\\CSP_futoshiki_skyscrapper.csproj",
+      "projectPath": "C:\\Users\\marar\\Desktop\\GitHub\\AI_CSP\\AI_CSP\\AI_CSP\\CSP_futoshiki_skyscrapper\\CSP_futoshiki_skyscrapper\\CSP_futoshiki_skyscrapper.csproj",
       "packagesPath": "C:\\Users\\marar\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\marar\\Desktop\\GitHub\\AI_CSP\\CSP_futoshiki_skyscrapper\\CSP_futoshiki_skyscrapper\\obj\\",
+      "outputPath": "C:\\Users\\marar\\Desktop\\GitHub\\AI_CSP\\AI_CSP\\AI_CSP\\CSP_futoshiki_skyscrapper\\CSP_futoshiki_skyscrapper\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

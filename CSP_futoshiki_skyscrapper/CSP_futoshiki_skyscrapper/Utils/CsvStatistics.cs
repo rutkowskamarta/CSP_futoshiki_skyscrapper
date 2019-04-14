@@ -7,8 +7,8 @@ namespace CSP_futoshiki_skyscrapper.Utils
     class CsvStatistics
     {
         public int numberOfSolution { get; }
-        public int numberOfIterations { get; }
         public double time { get; }
+        public int numberOfIterations { get; }
         public double totalTime { get; }
         public int totalIterations { get; }
 

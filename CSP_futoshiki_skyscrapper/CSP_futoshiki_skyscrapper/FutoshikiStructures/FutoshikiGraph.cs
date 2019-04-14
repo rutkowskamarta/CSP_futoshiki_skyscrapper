@@ -21,24 +21,21 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
         public FutoshikiGraph(int problemSize) : base(problemSize)
         {
             if (HEURISTIC_TYPE == HEURISTIC_TYPE_ENUM.GREEDY)
-            {
                 choosingVariableHeuristicsMethod = ChooseFirstNotSet;
-            }
-            else if (HEURISTIC_TYPE == HEURISTIC_TYPE_ENUM.MOST_LIMITING)
-            {
+
+            else if (HEURISTIC_TYPE == HEURISTIC_TYPE_ENUM.MOST_LIMITED)
                 choosingVariableHeuristicsMethod = ChooseTheMostLimitedAndNotSet;
-            }
-            else if(HEURISTIC_TYPE == HEURISTIC_TYPE_ENUM.SMALL_DOMAIN_AND_MANY_CONSTRAINTS)
-            {
+
+            else if(HEURISTIC_TYPE == HEURISTIC_TYPE_ENUM.SMALL_DOMAIN)
                 choosingVariableHeuristicsMethod = ChooseTheSmallestDomainAndGreatestConstraints;
-            }
+            
         }
 
         #region FORWARD_CHECKING_METHODS
 
         public bool IsAnyOfDomainsEmpty()
         {
-            return nodes.OfType<GraphNode>().AsParallel().Any(i => i.domain.Count== 0);
+            return nodes.OfType<GraphNode>().Any(i => i.domain.Count== 0);
         }
 
         public void AssignNewDataAndUpdateDomains(int xIndex, int yIndex, int newData)
@@ -264,9 +261,11 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
 
         private CSPNode ChooseTheMostLimitedAndNotSet()
         {
-            nodes.OfType<GraphNode>().AsParallel().Where(i=>i.data==0).ForAll(i => i.measure = CalculateMeasureMostLimited(i));
-            var ordered = nodes.OfType<GraphNode>().OrderByDescending(i => i.measure).Where(i => i.data == 0).ToList();
-            if(ordered.Count == 0)
+            var nodesCalculated = nodes.OfType<GraphNode>().Where(i => i.data == 0);
+            foreach (var n in nodesCalculated)
+                n.measure = CalculateMeasureMostLimited(n);
+            var ordered = nodesCalculated.OrderByDescending(i => i.measure).Where(i => i.data == 0);
+            if(ordered.Count() == 0)
                 return null;
             else
                 return ordered.First();
@@ -274,34 +273,34 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
 
         private CSPNode ChooseFirstNotSet()
         {
-            return nodes.OfType<GraphNode>().Where(i => i.data == 0).ToList().First();
+            return nodes.OfType<GraphNode>().Where(i => i.data == 0).First();
         }
 
         //tylko dla forward checking! to chyba pora to wyrzucić
         private CSPNode ChooseTheSmallestDomainAndGreatestConstraints()
         {
-            List<GraphNode> ordered;
+            IEnumerable<GraphNode> ordered;
             if (ALGORITHM_TYPE == ALGORITHM_TYPE_ENUM.FORWARD_CHECKING)
             {
-                ordered = nodes.OfType<GraphNode>().Select(item => item).Where(item => item.data == 0).OrderBy(i => i.domain.Count).ToList();
+                ordered = nodes.OfType<GraphNode>().Where(item => item.data == 0 && item.domain.Count!=0).OrderBy(i => i.domain.Count);
             }
             else
             {
                 nodes.OfType<GraphNode>().OfType<GraphNode>().ToList().ForEach(item => item.measure = ReturnAllPossibilitiesForElement(item).Count);
-                ordered = nodes.OfType<GraphNode>().Select(item => item).Where(item => item.data == 0).OrderBy(item => item.measure).ToList();
+                ordered = nodes.OfType<GraphNode>().Where(item => item.data == 0).OrderBy(item => item.measure);
             }
-            if (ordered.Count == 0)
+            if (ordered.Count() == 0)
                 return null;
 
-            List<GraphNode> elementsWithSmallestDomain;
+            IEnumerable<GraphNode> elementsWithSmallestDomain;
 
             if (ALGORITHM_TYPE == ALGORITHM_TYPE_ENUM.FORWARD_CHECKING)
             {
-                elementsWithSmallestDomain = ordered.Select(item => item).Where(item => item.domain.Count == ordered[0].domain.Count).ToList();
+                elementsWithSmallestDomain = ordered.Select(item => item).Where(item => item.domain.Count == ordered.ElementAt(0).domain.Count);
             }
             else
             {
-                elementsWithSmallestDomain = ordered.Select(item => item).Where(item => item.measure == ordered[0].measure).ToList();
+                elementsWithSmallestDomain = ordered.Select(item => item).Where(item => item.measure == ordered.ElementAt(0).measure);
             }
 
             var elementsOrdered = elementsWithSmallestDomain.OrderByDescending(item => item.outgoingEdges.Count);
@@ -309,11 +308,12 @@ namespace CSP_futoshiki_skyscrapper.FutoshikiStructures
 
         }
 
+
         public bool IsSolved()
         {
 
 
-            if (nodes.OfType<GraphNode>().AsParallel().Any(i => i.data == 0))
+            if (nodes.OfType<GraphNode>().Any(i => i.data == 0))
             //if (nodes.OfType<GraphNode>().Any(i => i.data == 0))
             {
                 return false;

@@ -8,12 +8,12 @@ using static CSP_futoshiki_skyscrapper.Utils.Utilities;
 using CSP_futoshiki_skyscrapper.SkyscraperStructures;
 using CSP_futoshiki_skyscrapper.FutoshikiStructures;
 using CSP_futoshiki_skyscrapper.Utils;
+using System.Threading.Tasks;
 
 namespace CSP_futoshiki_skyscrapper.CSP
 {
     class CSPBacktracking
     {
-
         private List<ICSPSolvable> solutionsList;
         private List<CsvStatistics> statisticsList;
 
@@ -28,13 +28,11 @@ namespace CSP_futoshiki_skyscrapper.CSP
             statisticsList = new List<CsvStatistics>();
 
             if (GAME_TYPE == GAME_TYPE_ENUM.FUTOSHIKI)
-            {
                 rootData = FutoshikiProblemSingleton.GetInstance().initialFutoshikiGraph.DeepClone();
-            }
+
             else if(GAME_TYPE == GAME_TYPE_ENUM.SKYSCRAPPER)
-            {
                 rootData = SkyscraperProblemSingleton.GetInstance().initialSkyscrapperArray.DeepClone();
-            }
+
             Solver();
         }
 
@@ -44,26 +42,36 @@ namespace CSP_futoshiki_skyscrapper.CSP
             CreateChildren(rootData);
             stopwatch.Stop();
 
-            statisticsList.Add(new CsvStatistics(0, 0, 0, stopwatch.Elapsed.TotalMilliseconds, numberOfIterations));
+            statisticsList.Add(new CsvStatistics(0, 0, 0, stopwatch.Elapsed.TotalSeconds, numberOfIterations));
             PrintAllSolutions();
-            WriteLine("Koniec: " + stopwatch.Elapsed.TotalMilliseconds + " ms");
-            SaveStatisticsToFile("back-tracking", statisticsList);
-            SaveAllSolutionsToTxtFile("back-tracking", solutionsList);
+
+            SaveStatisticsToFile(ALGORITHM_TYPE.ToString(), statisticsList);
+            SaveAllSolutionsToTxtFile(ALGORITHM_TYPE.ToString(), solutionsList);
         }
 
         private void CreateChildren(ICSPSolvable currentNode)
         {
             numberOfIterations++;
+
             CSPNode mostLimited = currentNode.ChooseElementByHeuristics();
 
             if (mostLimited == null)
             {
                 CheckIfWonWhenNoElementsLeft(currentNode);
+                numberOfIterations++;
             }
             else
             {
                 List<int> allPossibilities = currentNode.ReturnAllPossibilitiesForElement(mostLimited);
-                AddChildenForEveryPossibility(allPossibilities, currentNode, mostLimited);
+
+                ParallelOptions options = new ParallelOptions();
+                options.MaxDegreeOfParallelism = 4;
+
+                Parallel.ForEach(allPossibilities, options, (i) =>
+                {
+                    AddChild(i, currentNode, mostLimited);
+                });
+
             }
         }
 
@@ -71,13 +79,10 @@ namespace CSP_futoshiki_skyscrapper.CSP
         {
             if (currentNode.IsSolved())
             {
-                statisticsList.Add(new CsvStatistics(statisticsList.Count + 1, numberOfIterations, stopwatch.Elapsed.TotalMilliseconds, 0, 0));
+                statisticsList.Add(new CsvStatistics(statisticsList.Count + 1, numberOfIterations, stopwatch.Elapsed.TotalSeconds, 0, 0));
                 solutionsList.Add(currentNode);
                 currentNode.IsSolved();
-                WriteLine("ZNALAZŁEM teraz takie: "+ stopwatch.Elapsed.TotalMilliseconds+" ms");
                 currentNode.PrintAllElements();
-                WriteLine("================");
-
             }
         }
 
@@ -87,12 +92,18 @@ namespace CSP_futoshiki_skyscrapper.CSP
             {
                 ICSPSolvable CSPNodeClone = currentNode.DeepClone();
                 CSPNodeClone.AssignNewData(mostLimited.xIndex, mostLimited.yIndex, allPossibilities[i]);
-                
 
                 CreateChildren(CSPNodeClone);
             }
         }
-      
+
+        private void AddChild(int possibility, ICSPSolvable currentNode, CSPNode mostLimited)
+        {
+            ICSPSolvable nodeClone = currentNode.DeepClone();
+            nodeClone.AssignNewDataAndUpdateDomains(mostLimited.xIndex, mostLimited.yIndex, possibility);
+
+            CreateChildren(nodeClone);
+        }
 
         private void PrintAllSolutions()
         {

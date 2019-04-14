@@ -12,7 +12,6 @@ namespace CSP_futoshiki_skyscrapper.Utils
     class DataLoader
     {
         private delegate void loaderMethodDelegate();
-
         private loaderMethodDelegate loaderMethodFunction;
 
         public DataLoader()
@@ -98,14 +97,13 @@ namespace CSP_futoshiki_skyscrapper.Utils
         private void ParseConstraintFromTextLine(string line, FutoshikiGraph futoshikiGraph)
         {
             char[] constraintLine = line.ToCharArray();
-            int xIndex1 = System.Convert.ToInt32(constraintLine[0]) - 65;
+            int xIndex1 = Convert.ToInt32(constraintLine[0]) - 65;
             int yIndex1 = int.Parse(constraintLine[1].ToString()) - 1;
-            int xIndex2 = System.Convert.ToInt32(constraintLine[3]) - 65;
+            int xIndex2 = Convert.ToInt32(constraintLine[3]) - 65;
             int yIndex2 = int.Parse(constraintLine[4].ToString()) - 1;
 
             futoshikiGraph.AddEdgeFromSource(xIndex1, yIndex1, xIndex2, yIndex2, GraphEdge.EDGE_TYPE_ENUM.DESTINATION_GRATER);
             futoshikiGraph.AddEdgeFromSource(xIndex2, yIndex2, xIndex1, yIndex1, GraphEdge.EDGE_TYPE_ENUM.SOURCE_GREATER);
-
         }
 
         private GraphNode ParseNode(string line, int x, int y)

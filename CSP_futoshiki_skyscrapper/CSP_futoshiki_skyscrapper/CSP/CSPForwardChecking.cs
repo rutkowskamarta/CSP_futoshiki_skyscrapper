@@ -8,6 +8,7 @@ using static CSP_futoshiki_skyscrapper.Utils.Utilities;
 using CSP_futoshiki_skyscrapper.SkyscraperStructures;
 using CSP_futoshiki_skyscrapper.FutoshikiStructures;
 using CSP_futoshiki_skyscrapper.Utils;
+using System.Threading.Tasks;
 
 namespace CSP_futoshiki_skyscrapper.CSP
 {
@@ -19,7 +20,9 @@ namespace CSP_futoshiki_skyscrapper.CSP
         private Stopwatch stopwatch = new Stopwatch();
         private ICSPSolvable rootData;
         private int numberOfIterations = 0;
-        
+
+        private static bool hasRootBeenParallel = false;
+
         public CSPForwardChecking()
         {
             solutionsList = new List<ICSPSolvable>();
@@ -44,15 +47,14 @@ namespace CSP_futoshiki_skyscrapper.CSP
             stopwatch.Stop();
 
             PrintAllSolutions();
-            WriteLine("Koniec: " + stopwatch.Elapsed.TotalMilliseconds + " ms");
-            statisticsList.Add(new CsvStatistics(0, 0, 0, stopwatch.Elapsed.TotalMilliseconds, numberOfIterations));
-            SaveStatisticsToFile("forward-checking", statisticsList);
-            SaveAllSolutionsToTxtFile("forward-checking", solutionsList);
+
+            statisticsList.Add(new CsvStatistics(0, 0, 0, stopwatch.Elapsed.TotalSeconds, numberOfIterations));
+            SaveStatisticsToFile(ALGORITHM_TYPE.ToString(), statisticsList);
+            SaveAllSolutionsToTxtFile(ALGORITHM_TYPE.ToString(), solutionsList);
         }
 
         private void CreateChildren(ICSPSolvable currentNode)
         {
-            numberOfIterations++;
             CSPNode mostLimited = currentNode.ChooseElementByHeuristics();
 
             if (mostLimited == null)
@@ -60,7 +62,14 @@ namespace CSP_futoshiki_skyscrapper.CSP
             else
             {
                 List<int> allPossibilities = mostLimited.domain;
-                AddChildenForEveryPossibility(allPossibilities, currentNode, mostLimited);
+
+                ParallelOptions options = new ParallelOptions();
+                options.MaxDegreeOfParallelism = 4;
+
+                Parallel.ForEach(allPossibilities, options, (i) =>
+                {
+                    AddChild(i, currentNode, mostLimited);
+                });
             }
         }
         
@@ -79,15 +88,25 @@ namespace CSP_futoshiki_skyscrapper.CSP
             
         }
 
+        private void AddChild(int possibility, ICSPSolvable currentNode, CSPNode mostLimited)
+        {
+            ICSPSolvable nodeClone = currentNode.DeepClone();
+            nodeClone.AssignNewDataAndUpdateDomains(mostLimited.xIndex, mostLimited.yIndex, possibility);
+
+            if (!nodeClone.IsAnyOfDomainsEmpty())
+                CreateChildren(nodeClone);
+            else
+                numberOfIterations++;
+        }
+
+
         private void CheckIfWonWhenNoElementsLeft(ICSPSolvable currentNode)
         {
             if (currentNode.IsSolved())
             {
-                statisticsList.Add(new CsvStatistics(statisticsList.Count+1, numberOfIterations, stopwatch.Elapsed.TotalMilliseconds, 0, 0));
+                statisticsList.Add(new CsvStatistics(statisticsList.Count+1, numberOfIterations, stopwatch.Elapsed.TotalSeconds, 0, 0));
                 solutionsList.Add(currentNode);
-                WriteLine("ZNALAZŁEM teraz takie: " + stopwatch.Elapsed.TotalMilliseconds + " ms");
                 currentNode.PrintAllElements();
-                WriteLine("================");
             }
         }
 

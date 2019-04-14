@@ -3,6 +3,7 @@ using CSP_futoshiki_skyscrapper.Utils;
 using static System.Console;
 using CSP_futoshiki_skyscrapper.CSP;
 using NAudio.Wave;
+using System.IO;
 
 namespace CSP_futoshiki_skyscrapper
 {
@@ -15,19 +16,16 @@ namespace CSP_futoshiki_skyscrapper
             if (Utilities.ALGORITHM_TYPE == Utilities.ALGORITHM_TYPE_ENUM.BACKTRACKING)
             {
                 CSPBacktracking cSPBacktracking = new CSPBacktracking();
-
             }
             else if (Utilities.ALGORITHM_TYPE == Utilities.ALGORITHM_TYPE_ENUM.FORWARD_CHECKING)
             {
                 CSPForwardChecking cSPForwardChecking = new CSPForwardChecking();
-
             }
 
-            WriteLine("finished!");
             PlayFinishSound();
-            //ReadLine();
+            ReadLine();
         }
-
+   
         private static void PlayFinishSound()
         {
             WaveStream mainOutputStream = new WaveFileReader(Utilities.SOUND_FILE_NAME);
@@ -36,9 +34,7 @@ namespace CSP_futoshiki_skyscrapper
             WaveOutEvent player = new WaveOutEvent();
 
             player.Init(volumeStream);
-
             player.Play();
-
         }
 
     }
